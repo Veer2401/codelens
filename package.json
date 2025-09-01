@@ -7,8 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "build:extension": "npm run build && cp -r dist/* extension/",
-    "watch:extension": "npm run build:extension && nodemon --watch src --ext js,jsx,ts,tsx --exec 'npm run build:extension'"
+    "build:extension": "npm run build && cp -r dist/* extension/ && cp extension/manifest.json extension/ && cp extension/content.js extension/ && cp extension/content.css extension/ && cp extension/background.js extension/ && cp extension/popup.html extension/",
+    "watch:extension": "npm run build:extension && nodemon --watch src --ext js,jsx,ts,tsx --exec 'npm run build:extension'",
+    "demo": "open demo.html"
   },
   "keywords": [
     "chrome-extension",
