@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div className="col-span-1 md:col-span-2">
             <h3 className="text-2xl font-bold mb-4">
-              Live Complexity Visualizer
+              CodeLens
             </h3>
             <p className="text-gray-300 mb-4 max-w-md">
               Analyze code complexity in real-time with our powerful Chrome extension. 
@@ -36,9 +36,9 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-4">Product</h4>
             <ul className="space-y-2 text-gray-300">
               <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">API</a></li>
+              {/* <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li> */}
+              {/* <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li> */}
+              {/* <li><a href="#" className="hover:text-white transition-colors">API</a></li> */}
             </ul>
           </div>
           
@@ -54,9 +54,9 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">
+          {/* <p className="text-gray-400 text-sm">
             © 2024 Live Complexity Visualizer. All rights reserved.
-          </p>
+          </p> */}
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</a>
             <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</a>

@@ -1,292 +1,310 @@
-# Live Complexity Visualizer
+# CodeLens - Complexity Visualizer
 
-A powerful Chrome extension that analyzes code complexity in real-time inside web-based editors with beautiful visualizations.
+A powerful Chrome extension that provides real-time code complexity analysis with beautiful visualizations for web-based editors. **Now supporting multiple programming languages!**
 
-## 🚀 Features
+## 🌟 **New Multi-Language Support**
 
-- **Real-time Analysis**: Get instant complexity insights as you code
-- **Inline Highlights**: Color-coded backgrounds show complexity levels directly in your code editor
-- **Smart Detection**: Automatically detects code blocks in GitHub, CodeSandbox, StackBlitz, and more
-- **Beautiful Charts**: Interactive bubble charts and graphs show complexity distribution
-- **Floating Widget**: Always-visible complexity score and statistics
-- **Privacy First**: All analysis happens locally in your browser
-- **Open Source**: Built with transparency and community in mind
+CodeLens now supports **20+ programming languages** including:
 
-## 🛠️ Tech Stack
+### **Web Technologies**
+- **JavaScript** (JS, JSX) - Full AST parsing with Esprima
+- **TypeScript** (TS, TSX) - Advanced type-aware analysis
+- **HTML** - Structure complexity + embedded script analysis
+- **CSS/SCSS/Sass** - Selector and property complexity
 
-- **Frontend**: React + TailwindCSS
-- **Code Analysis**: JavaScript with Esprima for AST parsing
-- **Extension**: Chrome Manifest V3
-- **Build Tool**: Vite
-- **Charts**: Custom SVG-based visualizations
+### **Programming Languages**
+- **Python** - Function and control flow analysis
+- **Java** - Method complexity and OOP patterns
+- **C++** - Template and function complexity
+- **C** - Function and control structure analysis
+- **Go** - Function and package complexity
+- **Rust** - Function and error handling analysis
+- **Swift** - Method and control flow complexity
+- **Kotlin** - Function and expression analysis
+- **Scala** - Method and functional complexity
+- **Ruby** - Method and block complexity
+- **PHP** - Function and class analysis
 
-## 📦 Installation
+### **Shell & Scripting**
+- **Bash/Shell** - Command and control flow analysis
+- **Perl** - Function and regex complexity
 
-### Development Setup
+## ✨ **Features**
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd live-complexity-visualiser
-   ```
+### **Real-Time Analysis**
+- **Instant Detection**: Automatically detects code blocks on supported platforms
+- **Language Recognition**: Intelligent language detection based on file extensions and content
+- **Live Updates**: Re-analyzes code when DOM changes are detected
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+### **Visual Complexity Indicators**
+- **Color-Coded Highlights**: Green (low), Yellow (medium), Red (high), Purple (extreme)
+- **Inline Annotations**: Hover tooltips showing function complexity details
+- **Floating Widget**: Real-time complexity score and function count
 
-3. **Build the project**
-   ```bash
-   # Build for development
-   npm run dev
-   
-   # Build for production
-   npm run build
-   
-   # Build extension files
-   npm run build:extension
-   ```
+### **Comprehensive Metrics**
+- **Cyclomatic Complexity**: Measures decision points and control flow
+- **Function Analysis**: Individual complexity scores for each function/method
+- **Overall Health Score**: Aggregated complexity assessment
+- **Language-Specific Metrics**: Tailored analysis for each programming language
 
-4. **Load the extension in Chrome**
-   - Open Chrome and go to `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked"
-   - Select the `extension` folder
+### **Multi-Platform Support**
+- **GitHub** ⭐ (works best)
+- **CodeSandbox** - JavaScript/React playgrounds
+- **StackBlitz** - Full-stack development environments
+- **Replit** - Multi-language coding platform
+- **JSFiddle** - JavaScript testing environment
+- **CodePen** - Frontend code playgrounds
+- **GitLab** - Git repository hosting
+- **Bitbucket** - Git repository hosting
+- **SourceForge** - Open source hosting
+- **Pastebin** - Code sharing platform
+- **Gist** - GitHub code snippets
 
-### Production Installation
+## 🚀 **Quick Start**
 
-1. Download the extension from the Chrome Web Store (when available)
-2. Click "Add to Chrome"
-3. The extension will automatically analyze code on supported sites
+### **1. Install the Extension**
+1. Download the extension files
+2. Go to `chrome://extensions/`
+3. Enable "Developer mode"
+4. Click "Load unpacked" and select the `extension` folder
 
-## 🎯 Supported Platforms
+### **2. Test on GitHub**
+1. Visit any GitHub repository with code files
+2. Click on a `.js`, `.py`, `.java`, `.cpp`, `.html`, or `.css` file
+3. Wait for the floating widget to appear (3-5 seconds)
+4. Click "🔍 Analyze Code" to start analysis
 
-- **GitHub**: Repository files, Gists, Pull Requests
-- **CodeSandbox**: Sandbox projects and files
-- **StackBlitz**: Web development projects
-- **Replit**: Online IDE projects
-- **JSFiddle**: Code playground
-- **CodePen**: Frontend code examples
+### **3. View Results**
+- **Floating Widget**: Shows overall complexity and function count
+- **Inline Highlights**: Color-coded function complexity
+- **Extension Popup**: Detailed analysis with charts and breakdowns
 
-## 🔧 Usage
+## 🧪 **Testing**
 
-### Basic Usage
-
-1. **Install the extension** from the Chrome Web Store
-2. **Navigate to a supported platform** (e.g., GitHub repository)
-3. **View code files** - the extension automatically analyzes complexity
-4. **See inline highlights** with color-coded backgrounds:
-   - 🟢 Green: Low complexity (1-5)
-   - 🟡 Yellow: Medium complexity (6-10)
-   - 🔴 Red: High complexity (11-15)
-   - 🟤 Brown: Extreme complexity (16+)
-
-### Extension Popup
-
-- Click the extension icon to open the popup
-- View overall complexity score and statistics
-- Browse individual functions and their complexity
-- See visual charts and complexity distribution
-
-### Floating Widget
-
-- Always-visible widget showing current complexity metrics
-- Draggable and resizable
-- Click to close or minimize
-
-### Context Menu
-
-- Right-click on any page to manually trigger analysis
-- Useful for dynamic content or single-page applications
-
-## 📊 Complexity Metrics
-
-The extension calculates complexity using the **Cyclomatic Complexity** algorithm:
-
-- **Base complexity**: 1 for each function
-- **Control flow**: +1 for each `if`, `switch`, `for`, `while`, `catch`, etc.
-- **Logical operators**: +1 for each `&&`, `||`, `?`, `:`
-
-### Complexity Levels
-
-| Level | Score | Description | Recommendation |
-|-------|-------|-------------|----------------|
-| Low | 1-5 | Excellent | Keep it up! |
-| Medium | 6-10 | Good | Consider some improvements |
-| High | 11-15 | Fair | Needs refactoring |
-| Extreme | 16+ | Poor | Major refactoring required |
-
-## 🎨 Customization
-
-### Settings
-
-Access settings through the extension popup:
-
-- **Auto-analyze**: Automatically analyze code when navigating
-- **Show Widget**: Toggle floating widget visibility
-- **Highlight Threshold**: Set minimum complexity for highlights
-- **Theme**: Choose between light, dark, or auto
-
-### Styling
-
-The extension uses CSS custom properties for easy theming:
-
-```css
-:root {
-  --complexity-low: #10b981;
-  --complexity-medium: #f59e0b;
-  --complexity-high: #ef4444;
-  --complexity-extreme: #7c2d12;
-}
+### **Quick Test**
+```bash
+npm run test
 ```
+Opens `test-extension.html` for basic functionality testing.
 
-## 🏗️ Architecture
+### **Multi-Language Test**
+```bash
+open multi-language-test.html
+```
+Comprehensive test page with examples in all supported languages.
 
-### Project Structure
+### **Expected Results by Language**
+
+| Language | Example File | Expected Functions | Complexity Range |
+|----------|--------------|-------------------|------------------|
+| JavaScript | `example.js` | 3 functions | 8-12 |
+| Python | `example.py` | 2 functions | 6-10 |
+| Java | `Example.java` | 3 methods | 8-15 |
+| C++ | `example.cpp` | 3 functions | 10-18 |
+| HTML | `example.html` | 2 JS functions + structure | 5-12 |
+| CSS | `example.css` | 1 stylesheet | 8-15 |
+
+## 🔧 **How It Works**
+
+### **Language Detection**
+1. **File Extension**: Primary detection method (`.js`, `.py`, `.java`, etc.)
+2. **Content Analysis**: Fallback detection for files without clear extensions
+3. **Shebang Detection**: Identifies shell scripts and interpreters
+
+### **Complexity Calculation**
+- **JavaScript/TypeScript**: Full AST parsing with Esprima
+- **Python**: Function detection with control flow analysis
+- **Java/C++**: Method/function parsing with decision point counting
+- **HTML**: Structure nesting + embedded script analysis
+- **CSS**: Selector, property, and media query complexity
+
+### **Analysis Process**
+1. **Code Detection**: Finds code blocks using platform-specific selectors
+2. **Language Recognition**: Determines programming language automatically
+3. **Parsing**: Uses appropriate parser for each language
+4. **Complexity Calculation**: Counts decision points and control structures
+5. **Visualization**: Applies color-coded highlights and updates widget
+
+## 🛠 **Technical Stack**
+
+- **Frontend**: React.js + TailwindCSS
+- **Extension**: Chrome Manifest V3
+- **Parsing**: Esprima (JavaScript), Regex-based (other languages)
+- **Build Tool**: Vite
+- **Styling**: TailwindCSS with custom complexity colors
+
+## 📁 **Project Structure**
 
 ```
 live-complexity-visualiser/
 ├── src/                    # React source code
-│   ├── components/         # React components
-│   ├── App.jsx            # Main app component
-│   ├── main.jsx           # Entry point
-│   └── popup.jsx          # Extension popup entry
+│   ├── components/         # UI components
+│   ├── App.jsx            # Landing page
+│   └── popup.jsx          # Extension popup
 ├── extension/              # Chrome extension files
-│   ├── manifest.json      # Extension manifest
-│   ├── content.js         # Content script
+│   ├── manifest.json      # Extension configuration
+│   ├── content.js         # Content script (multi-language support)
 │   ├── background.js      # Service worker
-│   ├── popup.html         # Popup HTML
-│   └── content.css        # Content script styles
-├── dist/                   # Built files
-├── package.json            # Dependencies and scripts
-├── vite.config.js          # Vite configuration
-└── tailwind.config.js      # TailwindCSS configuration
+│   └── content.css        # Styling for injected elements
+├── multi-language-test.html # Test page for all languages
+├── test-extension.html    # Basic functionality test
+└── TROUBLESHOOTING.md     # Debugging guide
 ```
 
-### Key Components
+## 🔍 **Troubleshooting**
 
-1. **Content Script** (`content.js`): Analyzes code and injects highlights
-2. **Background Service Worker** (`background.js`): Manages extension lifecycle
-3. **Popup UI** (`popup.jsx`): Extension popup interface
-4. **Landing Page** (`App.jsx`): Marketing website
+### **Common Issues**
 
-### Data Flow
+#### **"Could not connect to page" Error**
+1. **Refresh the page** - Content script might not be loaded
+2. **Check platform support** - Ensure you're on a supported site
+3. **Reload extension** - Go to `chrome://extensions/` and click reload
+4. **Check console logs** - Look for "CodeLens:" messages
 
-1. Content script detects code blocks on the page
-2. Uses Esprima to parse JavaScript/TypeScript code
-3. Calculates complexity metrics for each function
-4. Applies visual highlights and updates widget
-5. Popup displays detailed analysis and charts
+#### **No Floating Widget**
+1. **Wait 3-5 seconds** - Widget appears after page analysis
+2. **Check console** - Look for error messages
+3. **Verify platform** - Ensure you're on a supported site
+4. **Refresh page** - Try reloading the page
 
-## 🧪 Development
+#### **No Code Highlights**
+1. **Check for code** - Ensure the page has programming code
+2. **Verify language** - Check if your language is supported
+3. **Click analyze** - Use the manual analyze button
+4. **Check console** - Look for analysis logs
 
-### Scripts
+### **Debug Information**
+Open browser console (F12) and look for:
+```
+✅ Good - Extension working:
+CodeLens: Setting up content script...
+CodeLens: Floating widget created
+CodeLens: Found code blocks: X
+CodeLens: Analyzing [language] code block
+CodeLens: Analysis complete: {...}
 
+❌ Bad - Extension issues:
+Could not establish connection
+Content script not loaded
+No code found to analyze
+```
+
+## 🚀 **Development**
+
+### **Build Commands**
 ```bash
-# Development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Build extension files
-npm run build:extension
-
-# Watch and rebuild extension
-npm run watch:extension
-
-# Preview production build
-npm run preview
+npm run dev          # Start development server
+npm run build        # Build React app
+npm run build:extension # Build extension
+npm run watch:extension # Watch mode for extension
+npm run preview      # Preview built app
+npm run test         # Open test page
 ```
 
-### Building the Extension
+### **Adding New Languages**
+1. **Update `detectLanguage()`** in `content.js`
+2. **Add complexity calculator** for the language
+3. **Update language mapping** in the popup
+4. **Test with sample code**
 
-1. Run `npm run build:extension`
-2. The extension files will be copied to the `extension/` folder
-3. Load the extension in Chrome from the `extension/` folder
+### **Customizing Analysis**
+- **Complexity thresholds**: Modify `getComplexityLabel()` function
+- **Color schemes**: Update CSS variables in `content.css`
+- **Detection patterns**: Modify `looksLikeCode()` function
 
-### Testing
+## 📚 **API Reference**
 
-- Test on various supported platforms
-- Verify complexity calculations with known code samples
-- Check responsive design on different screen sizes
-- Test with different code editors and syntax highlighting
+### **Content Script Messages**
+```javascript
+// Analyze code
+chrome.tabs.sendMessage(tabId, { action: 'analyzeCode' })
 
-## 🚀 Deployment
+// Get complexity data
+chrome.tabs.sendMessage(tabId, { action: 'getComplexityData' })
 
-### Chrome Web Store
+// Highlight function
+chrome.tabs.sendMessage(tabId, { 
+  action: 'highlightFunction', 
+  functionName: 'functionName' 
+})
 
-1. Build the extension: `npm run build:extension`
-2. Create a ZIP file of the `extension/` folder
-3. Upload to the Chrome Web Store
-4. Submit for review
+// Ping content script
+chrome.tabs.sendMessage(tabId, { action: 'ping' })
+```
 
-### Manual Distribution
+### **Response Format**
+```javascript
+{
+  success: true,
+  data: {
+    overallScore: 15,
+    functions: [...],
+    totalFunctions: 5,
+    averageComplexity: 3.0,
+    language: 'javascript',
+    fileType: 'js'
+  }
+}
+```
 
-1. Build the extension: `npm run build:extension`
-2. Share the `extension/` folder with users
-3. Users can load it as an unpacked extension
+## 🌟 **Roadmap**
 
-## 🤝 Contributing
+### **Upcoming Features**
+- **More Languages**: Rust, Go, Swift, Kotlin support
+- **Advanced Metrics**: Cognitive complexity, maintainability index
+- **Custom Rules**: User-defined complexity thresholds
+- **Team Analytics**: Shared complexity reports
+- **IDE Integration**: VS Code, IntelliJ plugins
 
-We welcome contributions! Here's how to get started:
+### **Language Support Expansion**
+- **Functional Languages**: Haskell, Clojure, F#
+- **Systems Languages**: Assembly, Zig, Nim
+- **Domain-Specific**: SQL, YAML, TOML
+- **Configuration**: JSON, XML, INI
+
+## 🤝 **Contributing**
 
 1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
-3. **Make your changes**
-4. **Test thoroughly**
-5. **Commit your changes**: `git commit -m 'Add amazing feature'`
-6. **Push to the branch**: `git push origin feature/amazing-feature`
-7. **Open a Pull Request**
+2. **Create a feature branch**
+3. **Add language support** or **fix bugs**
+4. **Test thoroughly** with sample code
+5. **Submit a pull request**
 
-### Development Guidelines
+### **Adding Language Support**
+- Implement `calculate[Language]Complexity()` function
+- Add language detection patterns
+- Update language mapping and display names
+- Test with real code examples
 
-- Follow the existing code style
-- Add tests for new features
-- Update documentation as needed
-- Ensure cross-browser compatibility
-- Test on all supported platforms
+## 📄 **License**
 
-## 📝 License
+MIT License - see [LICENSE](LICENSE) file for details.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 🙏 **Acknowledgments**
 
-## 🙏 Acknowledgments
+- **Esprima** - JavaScript parsing library
+- **Chrome Extensions API** - Extension framework
+- **React & TailwindCSS** - UI framework and styling
+- **Open Source Community** - Language specifications and examples
 
-- **Esprima**: JavaScript parser for AST analysis
-- **TailwindCSS**: Utility-first CSS framework
-- **React**: UI library for building user interfaces
-- **Chrome Extensions API**: For browser integration
+## 🆘 **Support**
 
-## 📞 Support
+### **Getting Help**
+1. **Check troubleshooting guide**: `TROUBLESHOOTING.md`
+2. **Review test pages**: `test-extension.html`, `multi-language-test.html`
+3. **Check console logs** for debugging information
+4. **Verify platform support** and language compatibility
 
-- **Issues**: Report bugs and request features on GitHub
-- **Discussions**: Join community discussions
-- **Documentation**: Check the wiki for detailed guides
-- **Email**: Contact the maintainers directly
-
-## 🔮 Roadmap
-
-### Upcoming Features
-
-- [ ] Support for more programming languages
-- [ ] Advanced complexity metrics (cognitive complexity, maintainability index)
-- [ ] Integration with code review tools
-- [ ] Team collaboration features
-- [ ] Performance optimization suggestions
-- [ ] Custom complexity rules and thresholds
-
-### Long-term Goals
-
-- [ ] VS Code extension
-- [ ] GitHub Actions integration
-- [ ] API for third-party tools
-- [ ] Machine learning-based complexity prediction
-- [ ] Code quality scoring system
+### **Reporting Issues**
+Include:
+- **Platform**: GitHub, CodeSandbox, etc.
+- **Language**: JavaScript, Python, Java, etc.
+- **Console logs**: Any error messages
+- **Steps to reproduce**: Clear reproduction steps
 
 ---
 
-**Made with ❤️ by the Live Complexity Visualizer team**
+**Happy Coding! 🚀**
 
-*Help make code better, one function at a time.*
+*CodeLens - Making code complexity visible across all programming languages.*
 

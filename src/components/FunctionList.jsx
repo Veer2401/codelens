@@ -15,6 +15,21 @@ const FunctionList = ({ functions }) => {
     return 'Extreme'
   }
 
+  const handleFunctionClick = async (func) => {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+      if (tab) {
+        await chrome.tabs.sendMessage(tab.id, {
+          action: 'highlightFunction',
+          functionName: func.name,
+          line: func.line
+        })
+      }
+    } catch (error) {
+      console.error('Error highlighting function:', error)
+    }
+  }
+
   if (!functions || functions.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
@@ -36,19 +51,7 @@ const FunctionList = ({ functions }) => {
         <div
           key={index}
           className="border border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors cursor-pointer group"
-          onClick={() => {
-            // Send message to content script to highlight function
-            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-              const activeTab = tabs[0]
-              if (activeTab) {
-                chrome.tabs.sendMessage(activeTab.id, {
-                  action: 'highlightFunction',
-                  functionName: func.name,
-                  line: func.line
-                })
-              }
-            })
-          }}
+          onClick={() => handleFunctionClick(func)}
         >
           <div className="flex items-center justify-between mb-2">
             <div className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">

@@ -1,9 +1,9 @@
-// Live Complexity Visualizer - Background Service Worker
+// CodeLens - Complexity Visualizer - Background Service Worker
 
 // Handle extension installation
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
-    console.log('Live Complexity Visualizer installed successfully!')
+    console.log('CodeLens - Complexity Visualizer installed successfully!')
     
     // Set default settings
     chrome.storage.local.set({
@@ -103,34 +103,77 @@ chrome.action.onClicked.addListener((tab) => {
       // Show a notification for unsupported sites
       chrome.notifications.create({
         type: 'basic',
-        iconUrl: 'icons/icon128.png',
-        title: 'Live Complexity Visualizer',
+        title: 'CodeLens - Complexity Visualizer',
         message: 'This page is not supported. Please navigate to a supported code editor.'
       })
     }
   }
 })
 
-// Context menu for right-click analysis
+// Create context menu on installation
 chrome.runtime.onInstalled.addListener(() => {
+  console.log('CodeLens - Complexity Visualizer: Extension installed')
+  
+  // Create context menu items
   chrome.contextMenus.create({
-    id: 'analyzeCode',
-    title: 'Analyze Code Complexity',
-    contexts: ['page'],
-    documentUrlPatterns: [
-      'https://github.com/*',
-      'https://codesandbox.io/*',
-      'https://stackblitz.com/*',
-      'https://replit.com/*',
-      'https://jsfiddle.net/*',
-      'https://codepen.io/*'
-    ]
+    id: 'codelens-analyze',
+    title: '🔍 Analyze Code with CodeLens',
+    contexts: ['page', 'selection']
+  })
+  
+  chrome.contextMenus.create({
+    id: 'codelens-toggle-widget',
+    title: '📊 Toggle CodeLens Widget',
+    contexts: ['page']
+  })
+  
+  chrome.contextMenus.create({
+    id: 'codelens-separator',
+    type: 'separator',
+    contexts: ['page']
+  })
+  
+  chrome.contextMenus.create({
+    id: 'codelens-about',
+    title: 'ℹ️ About CodeLens',
+    contexts: ['page']
   })
 })
 
+// Handle context menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === 'analyzeCode') {
-    analyzeTab(tab.id)
+  switch (info.menuItemId) {
+    case 'codelens-analyze':
+      // Send message to content script to analyze code
+      chrome.tabs.sendMessage(tab.id, { action: 'analyzeCode' }).catch(() => {
+        // If content script not ready, show notification
+        chrome.notifications.create({
+          type: 'basic',
+          title: 'CodeLens - Complexity Visualizer',
+          message: 'Please refresh the page and try again to analyze code.'
+        })
+      })
+      break
+      
+    case 'codelens-toggle-widget':
+      // Toggle widget visibility
+      chrome.tabs.sendMessage(tab.id, { action: 'toggleWidget' }).catch(() => {
+        chrome.notifications.create({
+          type: 'basic',
+          title: 'CodeLens - Complexity Visualizer',
+          message: 'Please refresh the page and try again to toggle widget.'
+        })
+      })
+      break
+      
+    case 'codelens-about':
+      // Show about information
+      chrome.notifications.create({
+        type: 'basic',
+        title: 'CodeLens - Complexity Visualizer',
+        message: 'Multi-language code complexity analyzer. Use Ctrl+Shift+L to toggle widget.'
+      })
+      break
   }
 })
 
@@ -185,10 +228,10 @@ setInterval(() => {
 
 // Handle errors gracefully
 chrome.runtime.onSuspend.addListener(() => {
-  console.log('Live Complexity Visualizer background service worker suspended')
+  console.log('CodeLens - Complexity Visualizer background service worker suspended')
 })
 
 // Keep the service worker alive
 chrome.runtime.onStartup.addListener(() => {
-  console.log('Live Complexity Visualizer background service worker started')
+  console.log('CodeLens - Complexity Visualizer background service worker started')
 })

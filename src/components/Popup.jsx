@@ -12,34 +12,127 @@ const Popup = () => {
   })
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [currentTab, setCurrentTab] = useState('overview')
+  const [error, setError] = useState(null)
+  const [currentUrl, setCurrentUrl] = useState('')
+  const [isSupportedPlatform, setIsSupportedPlatform] = useState(false)
 
   useEffect(() => {
-    // Get complexity data from the current page
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const activeTab = tabs[0]
-      if (activeTab) {
-        chrome.tabs.sendMessage(activeTab.id, { action: 'getComplexityData' }, (response) => {
-          if (response && response.success) {
-            setComplexityData(response.data)
-          }
-        })
-      }
-    })
+    // Get current tab info and check if it's supported
+    checkCurrentTab()
   }, [])
 
-  const handleAnalyzeClick = () => {
+  const checkCurrentTab = async () => {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+      if (tab) {
+        setCurrentUrl(tab.url)
+        const supported = isPlatformSupported(tab.url)
+        setIsSupportedPlatform(supported)
+        
+        if (supported) {
+          // Try to get existing data
+          await getComplexityData()
+        } else {
+          setError('This page is not supported. Please navigate to a supported platform like GitHub, CodeSandbox, or StackBlitz.')
+        }
+      }
+    } catch (error) {
+      console.error('Error checking current tab:', error)
+      setError('Could not access current tab. Please refresh and try again.')
+    }
+  }
+
+  const isPlatformSupported = (url) => {
+    if (!url) return false
+    
+    const supportedSites = [
+      'github.com',
+      'codesandbox.io',
+      'stackblitz.com',
+      'replit.com',
+      'jsfiddle.net',
+      'codepen.io'
+    ]
+    
+    return supportedSites.some(site => url.includes(site))
+  }
+
+  const getComplexityData = async () => {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+      if (tab && isPlatformSupported(tab.url)) {
+        // First try to ping the content script
+        try {
+          await chrome.tabs.sendMessage(tab.id, { action: 'ping' })
+        } catch (pingError) {
+          setError('Content script not loaded. Please refresh the page and try again.')
+          return
+        }
+        
+        const response = await chrome.tabs.sendMessage(tab.id, { action: 'getComplexityData' })
+        if (response && response.success) {
+          setComplexityData(response.data)
+          setError(null)
+        } else {
+          // Content script might not be ready yet
+          setError('Content script not ready. Try clicking "Analyze" to initialize.')
+        }
+      }
+    } catch (error) {
+      console.error('Error getting complexity data:', error)
+      if (error.message.includes('Could not establish connection')) {
+        setError('Content script not loaded. Try refreshing the page or clicking "Analyze".')
+      } else {
+        setError('Could not connect to page. Make sure you are on a supported platform.')
+      }
+    }
+  }
+
+  const handleAnalyzeClick = async () => {
+    if (!isSupportedPlatform) {
+      setError('This page is not supported. Please navigate to a supported platform.')
+      return
+    }
+
     setIsAnalyzing(true)
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const activeTab = tabs[0]
-      if (activeTab) {
-        chrome.tabs.sendMessage(activeTab.id, { action: 'analyzeCode' }, (response) => {
-          setIsAnalyzing(false)
+    setError(null)
+    
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+      if (tab) {
+        // First try to get existing data
+        try {
+          const response = await chrome.tabs.sendMessage(tab.id, { action: 'getComplexityData' })
           if (response && response.success) {
             setComplexityData(response.data)
+            setError(null)
+            return
           }
-        })
+        } catch (e) {
+          // Content script not ready, continue with analysis
+        }
+
+        // Try to analyze code
+        const response = await chrome.tabs.sendMessage(tab.id, { action: 'analyzeCode' })
+        if (response && response.success) {
+          setComplexityData(response.data)
+          setError(null)
+        } else if (response && response.error) {
+          setError(response.error)
+        } else {
+          setError('Analysis failed. Please refresh the page and try again.')
+        }
       }
-    })
+    } catch (error) {
+      console.error('Error analyzing code:', error)
+      if (error.message.includes('Could not establish connection')) {
+        setError('Content script not loaded. Please refresh the page and try again.')
+      } else {
+        setError('Analysis failed. Make sure you are on a supported platform with JavaScript code.')
+      }
+    } finally {
+      setIsAnalyzing(false)
+    }
   }
 
   const getScoreColor = (score) => {
@@ -56,24 +149,114 @@ const Popup = () => {
     return 'Poor'
   }
 
+  const handleRefresh = () => {
+    checkCurrentTab()
+  }
+
+  const getLanguageDisplayName = (language) => {
+    switch (language) {
+      case 'javascript':
+        return 'JavaScript'
+      case 'typescript':
+        return 'TypeScript'
+      case 'python':
+        return 'Python'
+      case 'java':
+        return 'Java'
+      case 'csharp':
+        return 'C#'
+      case 'go':
+        return 'Go'
+      case 'rust':
+        return 'Rust'
+      default:
+        return language
+    }
+  }
+
+  const getLanguageColorClass = (language) => {
+    switch (language) {
+      case 'javascript':
+        return 'bg-blue-100 text-blue-800'
+      case 'typescript':
+        return 'bg-green-100 text-green-800'
+      case 'python':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'java':
+        return 'bg-red-100 text-red-800'
+      case 'csharp':
+        return 'bg-purple-100 text-purple-800'
+      case 'go':
+        return 'bg-teal-100 text-teal-800'
+      case 'rust':
+        return 'bg-orange-100 text-orange-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
+
   return (
     <div className="w-96 h-[600px] bg-white">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-lg font-bold">Complexity Visualizer</h1>
+          <h1 className="text-lg font-bold">CodeLens</h1>
           <button
             onClick={handleAnalyzeClick}
-            disabled={isAnalyzing}
+            disabled={isAnalyzing || !isSupportedPlatform}
             className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-sm transition-colors disabled:opacity-50"
           >
             {isAnalyzing ? 'Analyzing...' : 'Analyze'}
           </button>
         </div>
         <p className="text-blue-100 text-sm mt-1">
-          Real-time code complexity analysis
+          Real-time complexity analysis
         </p>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 p-3 mx-4 mt-4 rounded-lg">
+          <div className="text-red-800 text-sm mb-2">
+            <strong>Error:</strong> {error}
+          </div>
+          <div className="flex space-x-2">
+            <button 
+              onClick={handleRefresh}
+              className="text-red-600 hover:text-red-800 text-xs underline"
+            >
+              Refresh
+            </button>
+            <button 
+              onClick={getComplexityData}
+              className="text-red-600 hover:text-red-800 text-xs underline"
+            >
+              Try again
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Platform Info */}
+      {currentUrl && (
+        <div className="px-4 py-2 bg-gray-50 text-xs text-gray-600">
+          <div className="flex items-center justify-between">
+            <div>
+              <strong>Current page:</strong> {new URL(currentUrl).hostname}
+              {isSupportedPlatform && <span className="text-green-600 ml-2">✓ Supported</span>}
+              {!isSupportedPlatform && <span className="text-red-600 ml-2">✗ Not supported</span>}
+            </div>
+            {complexityData.language !== 'unknown' && (
+              <div className="flex items-center space-x-2">
+                <span className="text-gray-500">Language:</span>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${getLanguageColorClass(complexityData.language)}`}>
+                  {getLanguageDisplayName(complexityData.language)}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Navigation Tabs */}
       <div className="flex border-b border-gray-200">
@@ -98,7 +281,7 @@ const Popup = () => {
       </div>
 
       {/* Content */}
-      <div className="p-4 overflow-y-auto h-[480px]">
+      <div className="p-4 overflow-y-auto h-[400px]">
         {currentTab === 'overview' && (
           <div className="space-y-4">
             <ComplexityScore
@@ -109,14 +292,14 @@ const Popup = () => {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-gray-50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-2xl font-bold text-gray-900 truncate" title={complexityData.totalFunctions}>
                   {complexityData.totalFunctions}
                 </div>
                 <div className="text-sm text-gray-600">Total Functions</div>
               </div>
               <div className="bg-gray-50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-gray-900">
-                  {complexityData.averageComplexity.toFixed(1)}
+                <div className="text-2xl font-bold text-gray-900 truncate" title={complexityData.averageComplexity.toFixed(2)}>
+                  {complexityData.averageComplexity.toFixed(2)}
                 </div>
                 <div className="text-sm text-gray-600">Avg Complexity</div>
               </div>

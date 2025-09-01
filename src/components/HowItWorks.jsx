@@ -5,7 +5,7 @@ const HowItWorks = () => {
     {
       number: "01",
       title: "Install Extension",
-      description: "Add the Live Complexity Visualizer to Chrome from the Web Store with one click.",
+      description: "Add CodeLens to Chrome from the Web Store with one click.",
       icon: (
         <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
           <path d="M19 13H5v-2h14v2z"/>
@@ -51,9 +51,9 @@ const HowItWorks = () => {
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             How It Works
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Getting started with Live Complexity Visualizer is simple and takes just a few steps.
-          </p>
+          {/* <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Getting started with CodeLens is simple and takes just a few steps.
+          </p> */}
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

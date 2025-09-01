@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Live Complexity Visualizer",
+  "name": "CodeLens - Complexity Visualizer",
   "version": "1.0.0",
-  "description": "Analyze code complexity in real-time inside web-based editors with beautiful visualizations",
+  "description": "Real-time code complexity analysis with beautiful visualizations for web-based editors - Supports JavaScript, Python, Java, C++, HTML, CSS and more",
   "permissions": [
     "activeTab",
     "storage"
@@ -13,7 +13,12 @@
     "https://stackblitz.com/*",
     "https://replit.com/*",
     "https://jsfiddle.net/*",
-    "https://codepen.io/*"
+    "https://codepen.io/*",
+    "https://gitlab.com/*",
+    "https://bitbucket.org/*",
+    "https://sourceforge.net/*",
+    "https://pastebin.com/*",
+    "https://gist.github.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -26,7 +31,12 @@
         "https://stackblitz.com/*",
         "https://replit.com/*",
         "https://jsfiddle.net/*",
-        "https://codepen.io/*"
+        "https://codepen.io/*",
+        "https://gitlab.com/*",
+        "https://bitbucket.org/*",
+        "https://sourceforge.net/*",
+        "https://pastebin.com/*",
+        "https://gist.github.com/*"
       ],
       "js": ["content.js"],
       "css": ["content.css"],
@@ -35,19 +45,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Complexity Visualizer",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "32": "icons/icon32.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    }
-  },
-  "icons": {
-    "16": "icons/icon16.png",
-    "32": "icons/icon32.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+    "default_title": "CodeLens - Complexity Visualizer"
   },
   "web_accessible_resources": [
     {

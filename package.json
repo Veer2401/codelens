@@ -1,7 +1,8 @@
 {
   "name": "live-complexity-visualiser",
   "version": "1.0.0",
-  "description": "A Chrome extension that analyzes code complexity in real-time inside web-based editors",
+  "type": "module",
+  "description": "CodeLens - Real-time code complexity analysis with beautiful visualizations for web-based editors",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
@@ -9,11 +10,13 @@
     "preview": "vite preview",
     "build:extension": "npm run build && cp -r dist/* extension/ && cp extension/manifest.json extension/ && cp extension/content.js extension/ && cp extension/content.css extension/ && cp extension/background.js extension/ && cp extension/popup.html extension/",
     "watch:extension": "npm run build:extension && nodemon --watch src --ext js,jsx,ts,tsx --exec 'npm run build:extension'",
-    "demo": "open demo.html"
+    "demo": "open demo.html",
+    "test": "open test-extension.html"
   },
   "keywords": [
     "chrome-extension",
     "code-complexity",
+    "codelens",
     "esprima",
     "react",
     "tailwindcss"

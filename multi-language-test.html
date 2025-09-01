@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeLens - Multi-Language Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px;
+        }
+        .language-section {
+            background: white;
+            margin: 20px 0;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .language-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .language-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+        .description {
+            color: #64748b;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+        .complexity-info {
+            background: #f1f5f9;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+            margin: 16px 0;
+        }
+        .complexity-info h4 {
+            margin: 0 0 8px 0;
+            color: #1e293b;
+        }
+        .complexity-info p {
+            margin: 0;
+            color: #64748b;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 CodeLens Multi-Language Test</h1>
+        <p>Test the extension with different programming languages</p>
+        <p>Install the CodeLens extension and analyze each code block below</p>
+    </div>
+
+    <!-- JavaScript Section -->
+    <div class="language-section">
+        <div class="language-title">
+            <div class="language-icon" style="background: #f7df1e; color: #000;">JS</div>
+            JavaScript
+        </div>
+        <div class="description">
+            This JavaScript code demonstrates various complexity patterns including functions, loops, and conditional statements.
+        </div>
+        <div class="complexity-info">
+            <h4>Expected Results:</h4>
+            <p>• 3 functions detected (calculateSum, processArray, main)</p>
+            <p>• Overall complexity: 8-12</p>
+            <p>• Functions: calculateSum (low), processArray (medium), main (high)</p>
+        </div>
+        <div class="code-block" data-filename="example.js">
+function calculateSum(numbers) {
+    let sum = 0;
+    for (let i = 0; i < numbers.length; i++) {
+        sum += numbers[i];
+    }
+    return sum;
+}
+
+function processArray(arr, filterFn, mapFn) {
+    if (!Array.isArray(arr)) {
+        throw new Error('Input must be an array');
+    }
+    
+    const filtered = arr.filter(filterFn);
+    const mapped = filtered.map(mapFn);
+    
+    let result = 0;
+    for (let item of mapped) {
+        if (typeof item === 'number') {
+            result += item;
+        } else if (Array.isArray(item)) {
+            result += item.reduce((acc, val) => acc + val, 0);
+        }
+    }
+    
+    return result;
+}
+
+function main() {
+    const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    
+    try {
+        const sum = calculateSum(data);
+        console.log('Sum:', sum);
+        
+        const processed = processArray(
+            data,
+            x => x % 2 === 0,
+            x => x * 2
+        );
+        console.log('Processed:', processed);
+        
+        if (processed > 50) {
+            console.log('High result detected');
+            for (let i = 0; i < 3; i++) {
+                console.log(`Iteration ${i + 1}`);
+            }
+        } else {
+            console.log('Normal result');
+        }
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
+}
+
+main();
+        </div>
+    </div>
+
+    <!-- Python Section -->
+    <div class="language-section">
+        <div class="language-title">
+            <div class="language-icon" style="background: #3776ab; color: white;">Py</div>
+            Python
+        </div>
+        <div class="description">
+            Python code with functions, exception handling, and control flow structures.
+        </div>
+        <div class="complexity-info">
+            <h4>Expected Results:</h4>
+            <p>• 2 functions detected (process_data, main)</p>
+            <p>• Overall complexity: 6-10</p>
+            <p>• Functions: process_data (medium), main (medium)</p>
+        </div>
+        <div class="code-block" data-filename="example.py">
+def process_data(data_list, threshold=100):
+    """Process a list of data with various operations."""
+    if not data_list:
+        return []
+    
+    result = []
+    for item in data_list:
+        try:
+            if isinstance(item, (int, float)):
+                if item > threshold:
+                    result.append(item * 2)
+                else:
+                    result.append(item)
+            elif isinstance(item, str):
+                if len(item) > 5:
+                    result.append(item.upper())
+                else:
+                    result.append(item.lower())
+            elif isinstance(item, list):
+                processed = [x * 2 for x in item if x > 0]
+                result.extend(processed)
+        except Exception as e:
+            print(f"Error processing item {item}: {e}")
+            continue
+    
+    return result
+
+def main():
+    """Main function to demonstrate the data processing."""
+    sample_data = [
+        50, 150, 200, 25,
+        "hello", "world", "python",
+        [1, 2, 3, 4, 5],
+        [10, 20, 30]
+    ]
+    
+    try:
+        processed = process_data(sample_data, threshold=100)
+        print(f"Processed {len(processed)} items")
+        
+        if len(processed) > 10:
+            print("Large dataset detected")
+            for i, item in enumerate(processed[:5]):
+                print(f"Item {i}: {item}")
+        else:
+            print("Small dataset")
+            
+    except Exception as e:
+        print(f"Main error: {e}")
+
+if __name__ == "__main__":
+    main()
+        </div>
+    </div>
+
+    <!-- Java Section -->
+    <div class="language-section">
+        <div class="language-title">
+            <div class="language-icon" style="background: #ed8b00; color: white;">Ja</div>
+            Java
+        </div>
+        <div class="description">
+            Java class with methods demonstrating object-oriented complexity.
+        </div>
+        <div class="complexity-info">
+            <h4>Expected Results:</h4>
+            <p>• 3 methods detected (calculate, processData, main)</p>
+            <p>• Overall complexity: 8-15</p>
+            <p>• Methods: calculate (low), processData (high), main (medium)</p>
+        </div>
+        <div class="code-block" data-filename="Example.java">
+public class Example {
+    private int[] data;
+    
+    public Example(int[] data) {
+        this.data = data;
+    }
+    
+    public int calculate(int x, int y) {
+        if (x > 0 && y > 0) {
+            return x + y;
+        } else if (x < 0 || y < 0) {
+            return Math.abs(x) + Math.abs(y);
+        } else {
+            return 0;
+        }
+    }
+    
+    public int[] processData() {
+        if (data == null || data.length == 0) {
+            return new int[0];
+        }
+        
+        int[] result = new int[data.length];
+        int count = 0;
+        
+        for (int i = 0; i < data.length; i++) {
+            try {
+                if (data[i] > 0) {
+                    if (data[i] % 2 == 0) {
+                        result[count] = data[i] * 2;
+                    } else {
+                        result[count] = data[i] + 1;
+                    }
+                    count++;
+                } else if (data[i] < 0) {
+                    result[count] = Math.abs(data[i]);
+                    count++;
+                }
+            } catch (Exception e) {
+                System.err.println("Error processing element: " + e.getMessage());
+                continue;
+            }
+        }
+        
+        int[] finalResult = new int[count];
+        System.arraycopy(result, 0, finalResult, 0, count);
+        return finalResult;
+    }
+    
+    public static void main(String[] args) {
+        int[] sampleData = {1, -2, 3, -4, 5, 6, -7, 8, 9, -10};
+        Example example = new Example(sampleData);
+        
+        try {
+            int sum = example.calculate(10, 20);
+            System.out.println("Sum: " + sum);
+            
+            int[] processed = example.processData();
+            System.out.println("Processed " + processed.length + " items");
+            
+            for (int i = 0; i < processed.length; i++) {
+                if (processed[i] > 10) {
+                    System.out.println("Large value: " + processed[i]);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error in main: " + e.getMessage());
+        }
+    }
+}
+        </div>
+    </div>
+
+    <!-- C++ Section -->
+    <div class="language-section">
+        <div class="language-title">
+            <div class="language-icon" style="background: #00599c; color: white;">C++</div>
+            C++
+        </div>
+        <div class="description">
+            C++ code with functions, templates, and complex control flow.
+        </div>
+        <div class="complexity-info">
+            <h4>Expected Results:</h4>
+            <p>• 3 functions detected (calculate, processVector, main)</p>
+            <p>• Overall complexity: 10-18</p>
+            <p>• Functions: calculate (medium), processVector (high), main (medium)</p>
+        </div>
+        <div class="code-block" data-filename="example.cpp">
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <stdexcept>
+
+template<typename T>
+T calculate(T a, T b, char operation) {
+    switch (operation) {
+        case '+':
+            return a + b;
+        case '-':
+            return a - b;
+        case '*':
+            return a * b;
+        case '/':
+            if (b == 0) {
+                throw std::invalid_argument("Division by zero");
+            }
+            return a / b;
+        default:
+            throw std::invalid_argument("Invalid operation");
+    }
+}
+
+std::vector<int> processVector(const std::vector<int>& input) {
+    if (input.empty()) {
+        return {};
+    }
+    
+    std::vector<int> result;
+    result.reserve(input.size());
+    
+    for (size_t i = 0; i < input.size(); ++i) {
+        try {
+            int value = input[i];
+            
+            if (value > 0) {
+                if (value % 2 == 0) {
+                    result.push_back(value * 2);
+                } else {
+                    result.push_back(value + 1);
+                }
+            } else if (value < 0) {
+                result.push_back(std::abs(value));
+            }
+            
+            if (i > 0 && input[i] == input[i-1]) {
+                result.push_back(value * 10);
+            }
+            
+        } catch (const std::exception& e) {
+            std::cerr << "Error processing element " << i << ": " << e.what() << std::endl;
+            continue;
+        }
+    }
+    
+    std::sort(result.begin(), result.end());
+    return result;
+}
+
+int main() {
+    try {
+        std::vector<int> data = {1, -2, 3, -4, 5, 6, -7, 8, 9, -10};
+        
+        int result = calculate(10, 5, '+');
+        std::cout << "Calculation result: " << result << std::endl;
+        
+        auto processed = processVector(data);
+        std::cout << "Processed " << processed.size() << " items" << std::endl;
+        
+        for (size_t i = 0; i < processed.size(); ++i) {
+            if (processed[i] > 20) {
+                std::cout << "Large value at " << i << ": " << processed[i] << std::endl;
+            }
+        }
+        
+    } catch (const std::exception& e) {
+        std::cerr << "Error in main: " << e.what() << std::endl;
+        return 1;
+    }
+    
+    return 0;
+}
+        </div>
+    </div>
+
+    <!-- HTML Section -->
+    <div class="language-section">
+        <div class="language-title">
+            <div class="language-icon" style="background: #e34c26; color: white;">HTML</div>
+            HTML with JavaScript
+        </div>
+        <div class="description">
+            HTML document with embedded JavaScript demonstrating mixed complexity.
+        </div>
+        <div class="complexity-info">
+            <h4>Expected Results:</h4>
+            <p>• 2 JavaScript functions + HTML structure complexity</p>
+            <p>• Overall complexity: 5-12</p>
+            <p>• Functions: handleClick (low), processData (medium)</p>
+        </div>
+        <div class="code-block" data-filename="example.html">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complex HTML Example</title>
+    <style>
+        .container { padding: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .nested { margin: 10px; padding: 10px; background: #f0f0f0; }
+        .deep-nested { margin: 5px; padding: 5px; background: #e0e0e0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Complex HTML Structure</h1>
+            <nav>
+                <ul>
+                    <li><a href="#section1">Section 1</a></li>
+                    <li><a href="#section2">Section 2</a></li>
+                    <li><a href="#section3">Section 3</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <main>
+            <section id="section1" class="section">
+                <h2>Section 1</h2>
+                <div class="nested">
+                    <p>Nested content</p>
+                    <div class="deep-nested">
+                        <span>Deep nested element</span>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="section2" class="section">
+                <h2>Section 2</h2>
+                <div class="nested">
+                    <form>
+                        <input type="text" placeholder="Enter text">
+                        <button type="button" onclick="handleClick()">Click me</button>
+                    </form>
+                </div>
+            </section>
+            
+            <section id="section3" class="section">
+                <h2>Section 3</h2>
+                <div class="nested">
+                    <div class="deep-nested">
+                        <p>More nested content</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function handleClick() {
+            const input = document.querySelector('input');
+            if (input && input.value.trim()) {
+                processData(input.value);
+            }
+        }
+        
+        function processData(text) {
+            try {
+                if (text.length > 10) {
+                    console.log('Long text detected');
+                    for (let i = 0; i < 3; i++) {
+                        console.log(`Processing iteration ${i + 1}`);
+                    }
+                } else {
+                    console.log('Short text');
+                }
+                
+                const words = text.split(' ');
+                if (words.length > 5) {
+                    console.log('Multiple words found');
+                }
+                
+            } catch (error) {
+                console.error('Error processing data:', error);
+            }
+        }
+    </script>
+</body>
+</html>
+        </div>
+    </div>
+
+    <!-- CSS Section -->
+    <div class="language-section">
+        <div class="language-title">
+            <div class="language-icon" style="background: #1572b6; color: white;">CSS</div>
+            CSS with Advanced Features
+        </div>
+        <div class="description">
+            Complex CSS with selectors, media queries, animations, and nested rules.
+        </div>
+        <div class="complexity-info">
+            <h4>Expected Results:</h4>
+            <p>• 1 stylesheet with high complexity</p>
+            <p>• Overall complexity: 8-15</p>
+            <p>• Based on selectors, properties, media queries, and keyframes</p>
+        </div>
+        <div class="code-block" data-filename="example.css">
+/* Complex CSS with multiple features */
+.container {
+    display: flex;
+    flex-direction: column;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 20px;
+}
+
+.nav-links li a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.nav-links li a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #1e293b;
+}
+
+.card-content {
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.button:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.button:active {
+    transform: translateY(0);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .navigation {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .nav-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .main-content {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 15px;
+    }
+    
+    .card {
+        padding: 15px;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.slide-in {
+    animation: slideIn 0.4s ease-out;
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* Pseudo-elements and states */
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 8px 8px 0 0;
+}
+
+.button:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+.button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Complex selectors */
+.main-content .card:nth-child(odd) .card-header {
+    color: #7c3aed;
+}
+
+.nav-links li:first-child a {
+    font-weight: 700;
+}
+
+.nav-links li:last-child a {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Print styles */
+@media print {
+    .header,
+    .navigation,
+    .button {
+        display: none;
+    }
+    
+    .card {
+        border: 1px solid #000;
+        box-shadow: none;
+    }
+}
+        </div>
+    </div>
+
+    <script>
+        // Add some interactivity to the test page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('CodeLens Multi-Language Test Page Loaded');
+            console.log('Install the CodeLens extension and analyze each code block');
+            
+            // Add click handlers for better testing
+            const codeBlocks = document.querySelectorAll('.code-block');
+            codeBlocks.forEach((block, index) => {
+                block.addEventListener('click', function() {
+                    console.log(`Clicked on ${block.dataset.filename || 'code block ' + (index + 1)}`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

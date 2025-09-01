@@ -1,42 +1,49 @@
-/* Live Complexity Visualizer - Content Script Styles */
+/* CodeLens - Complexity Visualizer - Content Script Styles */
 
 /* Floating Widget */
-.complexity-widget {
+.codelens-widget {
   position: fixed;
   top: 20px;
   right: 20px;
   width: 200px;
-  background: white;
+  min-height: 160px;
+  max-height: 200px;
+  background: #1f2937;
+  border: 1px solid #374151;
   border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   z-index: 10000;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  overflow: hidden;
+  color: #f9fafb;
+  backdrop-filter: blur(10px);
   transition: all 0.3s ease;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.complexity-widget:hover {
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+.codelens-widget:hover {
   transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
 }
 
-.complexity-widget-header {
+.widget-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
   padding: 12px 16px;
+  border-radius: 12px 12px 0 0;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  font-size: 14px;
+  align-items: center;
+  cursor: move;
+  user-select: none;
+}
+
+.widget-title {
   font-weight: 600;
+  font-size: 14px;
+  color: white;
 }
 
-.complexity-widget-title {
-  margin-left: 8px;
-}
-
-.complexity-widget-close {
+.widget-close {
   background: none;
   border: none;
   color: white;
@@ -50,278 +57,334 @@
   justify-content: center;
   border-radius: 50%;
   transition: background-color 0.2s ease;
+  flex-shrink: 0;
 }
 
-.complexity-widget-close:hover {
+.widget-close:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-.complexity-widget-content {
+.widget-content {
   padding: 16px;
+  background: #1f2937;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
 }
 
-.complexity-widget-score {
-  text-align: center;
-  margin-bottom: 16px;
+.complexity-score,
+.function-count {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  min-height: 24px;
 }
 
-.score-number {
-  display: block;
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 1;
-  margin-bottom: 4px;
-}
-
-.score-label {
+.score-label,
+.count-label {
   font-size: 12px;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: #9ca3af;
+  font-weight: 500;
+  flex-shrink: 0;
+  max-width: 60px;
 }
 
-.complexity-widget-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.stat {
-  text-align: center;
-  padding: 8px;
-  background: #f9fafb;
-  border-radius: 8px;
-}
-
-.stat-number {
-  display: block;
+.score-number,
+.count-number {
   font-size: 18px;
+  font-weight: 700;
+  color: #f9fafb;
+  text-align: right;
+  min-width: 40px;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.analyze-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
   font-weight: 600;
-  color: #111827;
-  margin-bottom: 2px;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.stat-label {
-  font-size: 10px;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.analyze-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
-/* Complexity Score Colors */
-.score-number.complexity-low {
-  color: #10b981;
+.analyze-btn:active {
+  transform: translateY(0);
 }
 
-.score-number.complexity-medium {
-  color: #f59e0b;
+/* Complexity Colors */
+.complexity-low {
+  color: #10b981 !important;
 }
 
-.score-number.complexity-high {
-  color: #ef4444;
+.complexity-medium {
+  color: #f59e0b !important;
 }
 
-.score-number.complexity-extreme {
-  color: #7c2d12;
+.complexity-high {
+  color: #ef4444 !important;
+}
+
+.complexity-extreme {
+  color: #7c3aed !important;
 }
 
 /* Code Highlights */
 .complexity-highlight {
   position: relative;
   transition: all 0.3s ease;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: 1px 0;
 }
 
 .complexity-highlight.complexity-low {
   background-color: rgba(16, 185, 129, 0.1);
-  border-left: 4px solid #10b981;
+  border-left: 3px solid #10b981;
 }
 
 .complexity-highlight.complexity-medium {
   background-color: rgba(245, 158, 11, 0.1);
-  border-left: 4px solid #f59e0b;
+  border-left: 3px solid #f59e0b;
 }
 
 .complexity-highlight.complexity-high {
   background-color: rgba(239, 68, 68, 0.1);
-  border-left: 4px solid #ef4444;
+  border-left: 3px solid #ef4444;
 }
 
 .complexity-highlight.complexity-extreme {
-  background-color: rgba(124, 45, 18, 0.1);
-  border-left: 4px solid #7c2d12;
+  background-color: rgba(124, 58, 237, 0.1);
+  border-left: 3px solid #7c3aed;
 }
 
-/* Tooltips */
-.complexity-tooltip {
+/* Language-specific styling */
+.complexity-highlight[data-language="javascript"],
+.complexity-highlight[data-language="jsx"] {
+  border-left-color: #f7df1e;
+}
+
+.complexity-highlight[data-language="typescript"],
+.complexity-highlight[data-language="tsx"] {
+  border-left-color: #3178c6;
+}
+
+.complexity-highlight[data-language="cpp"],
+.complexity-highlight[data-language="c"] {
+  border-left-color: #00599c;
+}
+
+.complexity-highlight[data-language="java"] {
+  border-left-color: #ed8b00;
+}
+
+.complexity-highlight[data-language="python"] {
+  border-left-color: #3776ab;
+}
+
+.complexity-highlight[data-language="html"] {
+  border-left-color: #e34c26;
+}
+
+.complexity-highlight[data-language="css"] {
+  border-left-color: #1572b6;
+}
+
+/* Hover effects */
+.complexity-highlight:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Tooltip styles */
+.complexity-highlight::after {
+  content: attr(title);
   position: absolute;
-  top: 100%;
-  left: 0;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  z-index: 10001;
-  min-width: 200px;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1f2937;
+  color: #f9fafb;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-10px);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  z-index: 10001;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   pointer-events: none;
 }
 
-.complexity-highlight:hover .complexity-tooltip {
+.complexity-highlight:hover::after {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
-}
-
-.tooltip-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.tooltip-header strong {
-  color: #111827;
-  font-size: 14px;
-}
-
-.tooltip-complexity {
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
-}
-
-.tooltip-complexity.complexity-low {
-  background-color: #10b981;
-}
-
-.tooltip-complexity.complexity-medium {
-  background-color: #f59e0b;
-}
-
-.tooltip-complexity.complexity-high {
-  background-color: #ef4444;
-}
-
-.tooltip-complexity.complexity-extreme {
-  background-color: #7c2d12;
-}
-
-.tooltip-body {
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.tooltip-body > div {
-  margin-bottom: 4px;
-}
-
-/* GitHub Specific Styles */
-.blob-code.complexity-highlight {
-  padding-left: 8px;
-}
-
-.blob-code.complexity-highlight .complexity-tooltip {
-  left: 16px;
-}
-
-/* CodeMirror Specific Styles */
-.CodeMirror-code .complexity-highlight {
-  padding: 2px 8px;
-  margin: 2px 0;
-}
-
-/* Monaco Editor Specific Styles */
-.monaco-editor .view-lines .complexity-highlight {
-  padding: 2px 8px;
-  margin: 2px 0;
-}
-
-/* Ace Editor Specific Styles */
-.ace_editor .ace_content .complexity-highlight {
-  padding: 2px 8px;
-  margin: 2px 0;
+  transform: translateX(-50%) translateY(-4px);
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .complexity-widget {
+  .codelens-widget {
     width: 180px;
     right: 10px;
     top: 10px;
   }
   
-  .score-number {
-    font-size: 28px;
+  .widget-content {
+    padding: 12px;
   }
   
-  .complexity-tooltip {
-    min-width: 180px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-10px);
+  .score-number,
+  .count-number {
+    font-size: 16px;
   }
-  
-  .complexity-highlight:hover .complexity-tooltip {
-    transform: translateX(-50%) translateY(0);
-  }
+}
+
+/* Dark mode support for different platforms */
+.github-dark .codelens-widget,
+[data-theme="dark"] .codelens-widget {
+  background: #0d1117;
+  border-color: #30363d;
+}
+
+.github-dark .widget-content,
+[data-theme="dark"] .widget-content {
+  background: #0d1117;
 }
 
 /* Animation for new highlights */
-@keyframes highlightPulse {
+@keyframes highlightFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.complexity-highlight {
+  animation: highlightFadeIn 0.3s ease-out;
+}
+
+/* Loading state for analyze button */
+.analyze-btn.loading {
+  background: #6b7280;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.analyze-btn.loading::after {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Platform-specific adjustments */
+/* GitHub */
+.github .codelens-widget {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+}
+
+/* CodeSandbox */
+.codesandbox .codelens-widget {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* StackBlitz */
+.stackblitz .codelens-widget {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Replit */
+.replit .codelens-widget {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* JSFiddle */
+.jsfiddle .codelens-widget {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* CodePen */
+.codepen .codelens-widget {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Show Widget Button (when widget is hidden) */
+.codelens-show-widget {
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  font-size: 18px;
+  user-select: none;
+}
+
+.codelens-show-widget:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.codelens-show-widget:active {
+  transform: scale(0.95);
+}
+
+/* Animation for show widget button */
+@keyframes showWidgetPulse {
   0% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
   50% {
-    transform: scale(1.02);
-    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
   }
   100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 }
 
-.complexity-highlight.new {
-  animation: highlightPulse 1s ease-in-out;
-}
-
-/* Dark mode support for code editors */
-@media (prefers-color-scheme: dark) {
-  .complexity-highlight.complexity-low {
-    background-color: rgba(16, 185, 129, 0.2);
-  }
-  
-  .complexity-highlight.complexity-medium {
-    background-color: rgba(245, 158, 11, 0.2);
-  }
-  
-  .complexity-highlight.complexity-high {
-    background-color: rgba(239, 68, 68, 0.2);
-  }
-  
-  .complexity-highlight.complexity-extreme {
-    background-color: rgba(124, 45, 18, 0.2);
-  }
-  
-  .complexity-tooltip {
-    background: #1f2937;
-    border-color: #374151;
-    color: #f9fafb;
-  }
-  
-  .tooltip-header {
-    border-bottom-color: #374151;
-  }
-  
-  .tooltip-header strong {
-    color: #f9fafb;
-  }
+.codelens-show-widget {
+  animation: showWidgetPulse 2s infinite;
 }
