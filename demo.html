@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Complexity Visualizer - Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #64748b;
+            font-size: 18px;
+        }
+        .demo-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .demo-section h2 {
+            color: #1e293b;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .complexity-info {
+            background: #f1f5f9;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .complexity-info h3 {
+            margin: 0 0 10px 0;
+            color: #1e293b;
+        }
+        .complexity-info ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .complexity-info li {
+            margin-bottom: 5px;
+            color: #475569;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .feature-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .feature-card h3 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        .feature-card p {
+            color: #64748b;
+            margin: 0;
+        }
+        .cta {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-top: 40px;
+        }
+        .cta h2 {
+            margin-bottom: 20px;
+        }
+        .cta p {
+            margin-bottom: 30px;
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        .btn {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Live Complexity Visualizer</h1>
+            <p>See code complexity in real-time with beautiful visualizations</p>
+        </div>
+
+        <div class="demo-section">
+            <h2>📊 How It Works</h2>
+            <p>This Chrome extension automatically analyzes JavaScript/TypeScript code on supported platforms and provides:</p>
+            <ul>
+                <li><strong>Real-time complexity analysis</strong> using Esprima AST parsing</li>
+                <li><strong>Inline highlights</strong> with color-coded backgrounds</li>
+                <li><strong>Floating widget</strong> showing overall metrics</li>
+                <li><strong>Detailed popup</strong> with charts and function breakdowns</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔍 Code Analysis Example</h2>
+            <p>Here's a sample JavaScript function that the extension would analyze:</p>
+            
+            <div class="code-block">
+function calculateUserScore(user, transactions, preferences) {
+    let score = 0;
+    
+    // Base score calculation
+    if (user.isVerified) {
+        score += 100;
+    }
+    
+    // Transaction analysis
+    for (let i = 0; i < transactions.length; i++) {
+        const transaction = transactions[i];
+        
+        if (transaction.amount > 1000) {
+            score += 50;
+        } else if (transaction.amount > 500) {
+            score += 25;
+        } else if (transaction.amount > 100) {
+            score += 10;
+        }
+        
+        if (transaction.type === 'credit') {
+            score += 20;
+        } else if (transaction.type === 'debit') {
+            score -= 10;
+        }
+    }
+    
+    // Preference matching
+    if (preferences && preferences.length > 0) {
+        for (let j = 0; j < preferences.length; j++) {
+            const preference = preferences[j];
+            
+            if (preference.category === 'high_value') {
+                score += 30;
+            } else if (preference.category === 'frequent') {
+                score += 15;
+            }
+        }
+    }
+    
+    // Final adjustments
+    if (score > 500) {
+        score = Math.min(score, 1000);
+    } else if (score < 0) {
+        score = 0;
+    }
+    
+    return score;
+}
+            </div>
+
+            <div class="complexity-info">
+                <h3>Complexity Analysis Results:</h3>
+                <ul>
+                    <li><strong>Function:</strong> calculateUserScore</li>
+                    <li><strong>Complexity Score:</strong> 15 (High)</li>
+                    <li><strong>Control Flow Statements:</strong> 8 if/else statements, 2 for loops</li>
+                    <li><strong>Recommendation:</strong> Consider breaking into smaller functions</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎨 Visual Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>🟢 Low Complexity (1-5)</h3>
+                    <p>Excellent code quality. Functions are simple and easy to understand.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🟡 Medium Complexity (6-10)</h3>
+                    <p>Good code quality. Consider minor improvements for better maintainability.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔴 High Complexity (11-15)</h3>
+                    <p>Fair code quality. Functions need refactoring to reduce complexity.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🟤 Extreme Complexity (16+)</h3>
+                    <p>Poor code quality. Major refactoring required to improve maintainability.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎯 Supported Platforms</h2>
+            <ul>
+                <li><strong>GitHub:</strong> Repository files, Gists, Pull Requests</li>
+                <li><strong>CodeSandbox:</strong> Sandbox projects and files</li>
+                <li><strong>StackBlitz:</strong> Web development projects</li>
+                <li><strong>Replit:</strong> Online IDE projects</li>
+                <li><strong>JSFiddle:</strong> Code playground</li>
+                <li><strong>CodePen:</strong> Frontend code examples</li>
+            </ul>
+        </div>
+
+        <div class="cta">
+            <h2>Ready to improve your code quality?</h2>
+            <p>Install the Live Complexity Visualizer Chrome extension and start writing better, more maintainable code today!</p>
+            <a href="#" class="btn">Add to Chrome</a>
+        </div>
+    </div>
+
+    <script>
+        // Demo script to show how the extension would work
+        console.log('Live Complexity Visualizer Demo Page');
+        console.log('This page demonstrates the types of code the extension would analyze.');
+        
+        // Simulate complexity analysis
+        function demoAnalysis() {
+            const functions = [
+                { name: 'calculateUserScore', complexity: 15, line: 1 },
+                { name: 'validateInput', complexity: 3, line: 45 },
+                { name: 'formatData', complexity: 7, line: 67 }
+            ];
+            
+            console.log('Complexity Analysis Results:', functions);
+            console.log('Overall Score:', functions.reduce((sum, f) => sum + f.complexity, 0) / functions.length);
+        }
+        
+        // Run demo analysis
+        demoAnalysis();
+    </script>
+</body>
+</html>
