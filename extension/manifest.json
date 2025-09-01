@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "Live Complexity Visualizer",
+  "version": "1.0.0",
+  "description": "Analyze code complexity in real-time inside web-based editors with beautiful visualizations",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://github.com/*",
+    "https://codesandbox.io/*",
+    "https://stackblitz.com/*",
+    "https://replit.com/*",
+    "https://jsfiddle.net/*",
+    "https://codepen.io/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://github.com/*",
+        "https://codesandbox.io/*",
+        "https://stackblitz.com/*",
+        "https://replit.com/*",
+        "https://jsfiddle.net/*",
+        "https://codepen.io/*"
+      ],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Complexity Visualizer",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["widget.html", "widget.css", "widget.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
