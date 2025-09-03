@@ -209,13 +209,6 @@ const Popup = () => {
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-bold">CodeLens</h1>
-          <button
-            onClick={handleAnalyzeClick}
-            disabled={isAnalyzing || !isSupportedPlatform}
-            className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded text-sm transition-colors disabled:opacity-50"
-          >
-            {isAnalyzing ? 'Analyzing...' : 'Analyze'}
-          </button>
         </div>
         <p className="text-blue-100 text-sm mt-1">
           Real-time complexity analysis

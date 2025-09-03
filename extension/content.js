@@ -39,24 +39,22 @@ class CodeLensAnalyzer {
   async loadEsprima() {
     if (this.esprimaLoaded) return
     try {
-      if (typeof esprima === 'undefined') {
-        await new Promise((resolve, reject) => {
-          const script = document.createElement('script')
-          script.src = 'https://cdn.jsdelivr.net/npm/esprima@4.0.1/dist/esprima.min.js'
-          script.onload = () => {
-            this.esprimaLoaded = true
-            console.log('CodeLens: Esprima loaded successfully')
-            resolve()
-          }
-          script.onerror = () => {
-            console.error('CodeLens: Failed to load Esprima')
-            reject(new Error('Failed to load Esprima'))
-          }
-          document.head.appendChild(script)
-        })
-      } else {
-        this.esprimaLoaded = true
-      }
+      // Load bundled esprima from extension package to satisfy CSP
+      const url = chrome.runtime.getURL('assets/esprima.min.js')
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.onload = () => {
+          this.esprimaLoaded = true
+          console.log('CodeLens: Esprima loaded successfully (bundled)')
+          resolve()
+        }
+        script.onerror = () => {
+          console.error('CodeLens: Failed to load bundled Esprima')
+          reject(new Error('Failed to load Esprima'))
+        }
+        document.head.appendChild(script)
+      })
     } catch (error) {
       console.error('CodeLens: Error loading Esprima:', error)
     }
@@ -193,7 +191,13 @@ class CodeLensAnalyzer {
     const analyzeBtn = widget.querySelector('#codelens-analyze')
     if (analyzeBtn) {
       analyzeBtn.addEventListener('click', () => {
-        this.analyzePageCode()
+        try {
+          // Request the background to open the extension popup (or fallback popup window)
+          chrome.runtime.sendMessage({ action: 'openPopup' })
+        } catch (e) {
+          // Fallback: run analysis inline if messaging fails
+          this.analyzePageCode()
+        }
       })
     }
     

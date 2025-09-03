@@ -19,6 +19,37 @@ chrome.runtime.onInstalled.addListener((details) => {
 // Handle messages from content scripts and popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   switch (request.action) {
+    case 'openPopup':
+      // Try to open the browser action popup in-place (no new tab)
+      if (chrome.action && chrome.action.openPopup) {
+        chrome.action.openPopup(() => {
+          const err = chrome.runtime.lastError
+          if (err) {
+            // Fallback: open a small popup window to mimic the action popup
+            chrome.windows.create({
+              url: chrome.runtime.getURL('popup.html'),
+              type: 'popup',
+              width: 420,
+              height: 680
+            }, () => {
+              sendResponse({ success: true, fallback: true, error: err.message })
+            })
+          } else {
+            sendResponse({ success: true })
+          }
+        })
+        return true
+      }
+      // Fallback if openPopup is not available
+      chrome.windows.create({
+        url: chrome.runtime.getURL('popup.html'),
+        type: 'popup',
+        width: 420,
+        height: 680
+      }, () => {
+        sendResponse({ success: true, fallback: true })
+      })
+      return true
     case 'getSettings':
       chrome.storage.local.get(null, (settings) => {
         sendResponse({ success: true, settings })

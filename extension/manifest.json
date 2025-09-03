@@ -6,7 +6,9 @@
   "permissions": [
     "activeTab",
     "tabs",
-    "storage"
+    "storage",
+    "contextMenus",
+    "notifications"
   ],
   "host_permissions": [
     "https://github.com/*",
@@ -50,7 +52,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["widget.html", "widget.css", "widget.js"],
+      "resources": ["widget.html", "widget.css", "widget.js", "assets/esprima.min.js"],
       "matches": ["<all_urls>"]
     }
   ]

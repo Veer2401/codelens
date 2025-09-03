@@ -86,7 +86,8 @@
   color: #9ca3af;
   font-weight: 500;
   flex-shrink: 0;
-  max-width: 60px;
+  max-width: none;
+  white-space: nowrap;
 }
 
 .score-number,
