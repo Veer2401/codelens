@@ -5,6 +5,7 @@
   "description": "Real-time code complexity analysis with beautiful visualizations for web-based editors - Supports JavaScript, Python, Java, C++, HTML, CSS and more",
   "permissions": [
     "activeTab",
+    "tabs",
     "storage"
   ],
   "host_permissions": [

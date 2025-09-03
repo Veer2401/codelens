@@ -15,6 +15,11 @@ class CodeLensAnalyzer {
     this.floatingWidget = null
     this.isAnalyzing = false
     this.esprimaLoaded = false
+    this.selectionActive = false
+    this.analysisMode = 'full'
+    this.selectionTimer = null
+    this.lastSelectedText = ''
+    this.lastSelectedAt = 0
     
     this.init()
   }
@@ -33,20 +38,22 @@ class CodeLensAnalyzer {
 
   async loadEsprima() {
     if (this.esprimaLoaded) return
-    
     try {
-      // Load Esprima for JavaScript/JSX parsing
       if (typeof esprima === 'undefined') {
-        const script = document.createElement('script')
-        script.src = 'https://cdn.jsdelivr.net/npm/esprima@4.0.1/dist/esprima.min.js'
-        script.onload = () => {
-          this.esprimaLoaded = true
-          console.log('CodeLens: Esprima loaded successfully')
-        }
-        script.onerror = () => {
-          console.error('CodeLens: Failed to load Esprima')
-        }
-        document.head.appendChild(script)
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+          script.src = 'https://cdn.jsdelivr.net/npm/esprima@4.0.1/dist/esprima.min.js'
+          script.onload = () => {
+            this.esprimaLoaded = true
+            console.log('CodeLens: Esprima loaded successfully')
+            resolve()
+          }
+          script.onerror = () => {
+            console.error('CodeLens: Failed to load Esprima')
+            reject(new Error('Failed to load Esprima'))
+          }
+          document.head.appendChild(script)
+        })
       } else {
         this.esprimaLoaded = true
       }
@@ -126,25 +133,33 @@ class CodeLensAnalyzer {
       }
     })
 
-    // Create floating widget
+    // Create floating widget (start hidden)
     this.createFloatingWidget()
-    console.log('CodeLens: Floating widget created')
+    this.hideFloatingWidget()
+    console.log('CodeLens: Floating widget created and hidden')
     
     // Start observing DOM changes
     this.observeDOMChanges()
     console.log('CodeLens: DOM observer started')
     
-    // Initial analysis after a delay
-    setTimeout(() => {
-      console.log('CodeLens: Starting initial analysis...')
-      this.analyzePageCode()
-    }, 3000)
-    
-    // Also try to analyze immediately if page seems ready
-    if (document.readyState === 'complete') {
-      console.log('CodeLens: Page already loaded, analyzing immediately...')
-      setTimeout(() => this.analyzePageCode(), 1000)
+    // Only analyze on actual code pages
+    const tryAnalyze = () => {
+      if (this.isCodePage()) {
+        console.log('CodeLens: Code page detected, analyzing...')
+        this.analyzePageCode()
+        this.showFloatingWidget()
+      } else {
+        console.log('CodeLens: Not a code page, keeping widget hidden')
+        this.hideFloatingWidget()
+      }
     }
+    setTimeout(tryAnalyze, 1500)
+    if (document.readyState === 'complete') {
+      setTimeout(tryAnalyze, 500)
+    }
+
+    // Listen for text selection changes for selection-based analysis
+    document.addEventListener('selectionchange', () => this.handleSelectionChange())
   }
 
   createFloatingWidget() {
@@ -248,6 +263,33 @@ class CodeLensAnalyzer {
     }
   }
 
+  notifyPopupUpdate() {
+    try {
+      chrome.runtime.sendMessage({ type: 'complexityDataUpdated', data: this.complexityData })
+    } catch (e) {
+      // Ignore if popup not open
+    }
+  }
+
+  isCodePage() {
+    // Detect presence of common code containers or known file extensions
+    const knownSelectors = [
+      '.blob-code-inner',
+      '.highlight .blob-code',
+      '.js-file-line',
+      '.CodeMirror-line',
+      '.monaco-editor .view-line',
+      '.ace_editor .ace_line',
+      'pre code'
+    ]
+    for (const selector of knownSelectors) {
+      const el = document.querySelector(selector)
+      if (el) return true
+    }
+    const ext = this.getFileExtension()
+    return ['js','jsx','ts','tsx','c','cpp','java','py','html','css'].includes(ext)
+  }
+
   observeDOMChanges() {
     if (this.observer) {
       this.observer.disconnect()
@@ -287,46 +329,35 @@ class CodeLensAnalyzer {
     // Load Esprima if needed
     await this.loadEsprima()
     
-    const codeBlocks = this.findCodeBlocks()
-    console.log('CodeLens: Found code blocks:', codeBlocks.length)
-    
-    if (codeBlocks.length === 0) {
-      console.log('CodeLens: No code blocks found')
+    // If selection is active, prioritize analyzing only the selection
+    const selectionText = this.getSelectedCodeText()
+    if (selectionText) {
+      console.log('CodeLens: Selection detected, analyzing selected code only')
+      this.analysisMode = 'selection'
+      await this.analyzeCodeFromText(selectionText)
+      this.showFloatingWidget()
       return
     }
-    
-    let allFunctions = []
-    let totalComplexity = 0
-    let detectedLanguage = 'unknown'
-    
-    for (const block of codeBlocks) {
-      const code = block.textContent || block.innerText || ''
-      if (code.trim()) {
-        // Detect language for this block
-        const language = this.detectLanguage(block.dataset.filename || '', code)
-        detectedLanguage = language
-        
-        console.log('CodeLens: Analyzing', language, 'code block')
-        
-        // Analyze based on language
-        const result = this.calculateComplexityForLanguage(code, language)
-        
-        if (result.functions && result.functions.length > 0) {
-          allFunctions.push(...result.functions)
-          totalComplexity += result.overallScore
-        }
-      }
+
+    // Fallback: recently cached selection (e.g., user clicked popup and selection lost)
+    if (this.lastSelectedText && (Date.now() - this.lastSelectedAt) < 5000) {
+      console.log('CodeLens: Using recent cached selection for analysis')
+      this.analysisMode = 'selection'
+      await this.analyzeCodeFromText(this.lastSelectedText)
+      this.showFloatingWidget()
+      return
     }
-    
-    // Update complexity data
-    this.complexityData = {
-      overallScore: totalComplexity,
-      functions: allFunctions,
-      totalFunctions: allFunctions.length,
-      averageComplexity: allFunctions.length > 0 ? totalComplexity / allFunctions.length : 0,
-      language: detectedLanguage,
-      fileType: this.getFileExtension() || 'unknown'
+
+    // Otherwise analyze the primary code content once
+    const { code: primaryCode, languageHint } = this.getPrimaryCodeText()
+    if (!primaryCode || !primaryCode.trim()) {
+      console.log('CodeLens: No primary code detected')
+      return
     }
+
+    this.analysisMode = 'full'
+    await this.analyzeCodeFromText(primaryCode, languageHint)
+    this.showFloatingWidget()
     
     console.log('CodeLens: Analysis complete:', this.complexityData)
     
@@ -335,25 +366,162 @@ class CodeLensAnalyzer {
     
     // Apply highlights
     this.highlightAllFunctions()
+
+    // Notify popup (if open)
+    this.notifyPopupUpdate()
+  }
+
+  analyzeCodeFromText(code, languageHint) {
+    return new Promise((resolve) => {
+      try {
+        const ext = this.getFileExtension()
+        const detected = this.detectLanguage(ext ? `file.${ext}` : '', code)
+        const language = languageHint || detected
+        const result = this.calculateComplexityForLanguage(code, language)
+        const uniqueFunctions = this.dedupeFunctions(result.functions)
+        const totalComplexity = uniqueFunctions.reduce((sum, f) => sum + (f.complexity || 0), 0)
+        this.complexityData = {
+          overallScore: totalComplexity,
+          functions: uniqueFunctions,
+          totalFunctions: uniqueFunctions.length,
+          averageComplexity: uniqueFunctions.length > 0 ? totalComplexity / uniqueFunctions.length : 0,
+          language: language,
+          fileType: ext || 'unknown'
+        }
+        console.log('CodeLens: Analysis (mode=' + this.analysisMode + ') complete:', this.complexityData)
+        this.notifyPopupUpdate()
+        resolve()
+      } catch (e) {
+        console.error('CodeLens: analyzeCodeFromText error', e)
+        resolve()
+      }
+    })
+  }
+
+  getPrimaryCodeText() {
+    // Try GitHub file view lines
+    const ghLines = document.querySelectorAll('.blob-code-inner')
+    if (ghLines && ghLines.length > 0) {
+      const code = Array.from(ghLines).map(n => n.textContent || '').join('\n')
+      return { code, languageHint: this.detectLanguage(`file.${this.getFileExtension()}`, code) }
+    }
+    // Monaco-based editors
+    const monacoLines = document.querySelectorAll('.monaco-editor .view-line')
+    if (monacoLines && monacoLines.length > 0) {
+      const code = Array.from(monacoLines).map(n => n.textContent || '').join('\n')
+      return { code, languageHint: this.detectLanguage(`file.${this.getFileExtension()}`, code) }
+    }
+    // Ace editors
+    const aceLines = document.querySelectorAll('.ace_editor .ace_line')
+    if (aceLines && aceLines.length > 0) {
+      const code = Array.from(aceLines).map(n => n.textContent || '').join('\n')
+      return { code, languageHint: this.detectLanguage(`file.${this.getFileExtension()}`, code) }
+    }
+    // Pre/code blocks
+    const preCode = document.querySelector('pre code')
+    if (preCode) {
+      const code = preCode.textContent || ''
+      return { code, languageHint: this.detectLanguage(`file.${this.getFileExtension()}`, code) }
+    }
+    // Fallback: first generic code-like block
+    const blocks = this.findCodeBlocks()
+    if (blocks.length > 0) {
+      const code = blocks[0].textContent || blocks[0].innerText || ''
+      return { code, languageHint: this.detectLanguage(`file.${this.getFileExtension()}`, code) }
+    }
+    return { code: '', languageHint: 'unknown' }
+  }
+
+  getSelectedCodeText() {
+    const selection = window.getSelection()
+    if (!selection || selection.isCollapsed) return ''
+    const text = selection.toString()
+    if (!text || text.trim().length < 1) return ''
+    // Ensure selection is within a code container
+    const anchorNode = selection.anchorNode && selection.anchorNode.parentElement
+    if (!anchorNode) return ''
+    const codeAncestor = anchorNode.closest(
+      '.blob-code-inner, .highlight .blob-code, .js-file-line, .CodeMirror-line, .monaco-editor .view-line, .ace_editor .ace_line, pre, code'
+    )
+    if (!codeAncestor) return ''
+    // Looks like code
+    if (!this.looksLikeCode({ textContent: text })) return ''
+    return text
+  }
+
+  handleSelectionChange() {
+    if (this.selectionTimer) clearTimeout(this.selectionTimer)
+    this.selectionTimer = setTimeout(() => {
+      const text = this.getSelectedCodeText()
+      if (text) {
+        if (!this.selectionActive) {
+          console.log('CodeLens: Entering selection analysis mode')
+        }
+        this.selectionActive = true
+        this.analysisMode = 'selection'
+        this.lastSelectedText = text
+        this.lastSelectedAt = Date.now()
+        this.analyzeCodeFromText(text).then(() => {
+          this.updateFloatingWidget()
+          this.showFloatingWidget()
+        })
+      } else {
+        if (this.selectionActive) {
+          console.log('CodeLens: Exiting selection mode, reverting to full analysis')
+          this.selectionActive = false
+          if (this.isCodePage()) {
+            this.analysisMode = 'full'
+            this.analyzePageCode()
+          } else {
+            this.hideFloatingWidget()
+          }
+        }
+      }
+    }, 250)
+  }
+
+  dedupeFunctions(functions) {
+    const map = new Map()
+    functions.forEach(f => {
+      const key = `${f.name || 'anonymous'}:${f.line || 0}:${f.type || 'fn'}`
+      if (!map.has(key)) {
+        map.set(key, f)
+      }
+    })
+    return Array.from(map.values())
   }
 
   getFileExtension() {
-    // Try to get file extension from URL or page content
-    const url = window.location.href
-    const pathMatch = url.match(/\.([a-zA-Z0-9]+)(?:\?|$)/)
-    if (pathMatch) {
-      return pathMatch[1].toLowerCase()
-    }
-    
-    // Check for file extension in page title or content
-    const title = document.title.toLowerCase()
-    const extensions = ['js', 'jsx', 'ts', 'tsx', 'cpp', 'c', 'java', 'py', 'html', 'css']
-    for (const ext of extensions) {
-      if (title.includes('.' + ext)) {
-        return ext
+    // Prefer pathname segment after the last '/'
+    try {
+      const { pathname } = new URL(window.location.href)
+      const filename = pathname.split('/').pop() || ''
+      const m = filename.match(/\.([a-zA-Z0-9]+)$/)
+      if (m) return m[1].toLowerCase()
+    } catch (_) {}
+
+    // Fallback: look in common data attributes (GitHub etc.)
+    const candidates = [
+      '[data-path]',
+      '[data-filename]',
+      '.final-path',
+      'title'
+    ]
+    for (const sel of candidates) {
+      const el = document.querySelector(sel)
+      if (el) {
+        const text = (el.getAttribute('data-path') || el.getAttribute('data-filename') || el.textContent || '').trim().toLowerCase()
+        const m2 = text.match(/\.([a-z0-9]+)$/)
+        if (m2) return m2[1]
       }
     }
-    
+
+    // Last resort: page title scan
+    const title = document.title.toLowerCase()
+    const known = ['js','jsx','ts','tsx','cpp','c','java','py','html','css']
+    for (const ext of known) {
+      if (title.includes('.' + ext)) return ext
+    }
     return 'unknown'
   }
 
@@ -651,8 +819,58 @@ class CodeLensAnalyzer {
       }
     } catch (error) {
       console.error('CodeLens: Error parsing JavaScript:', error)
-      return { functions: [], overallScore: 0, totalFunctions: 0, averageComplexity: 0 }
+      // Fallback: best-effort regex extraction so Functions tab still shows entries
+      const fallbackFunctions = this.extractFunctionsBestEffort(code, 'javascript')
+      return {
+        functions: fallbackFunctions,
+        overallScore: 0,
+        totalFunctions: fallbackFunctions.length,
+        averageComplexity: 0
+      }
     }
+  }
+
+  extractFunctionsBestEffort(code, language) {
+    const results = []
+    const pushFn = (name, index) => {
+      results.push({
+        name: name || 'anonymous',
+        complexity: 0,
+        line: code.substring(0, index).split('\n').length,
+        type: 'function',
+        label: this.getComplexityLabel(0),
+        colorClass: this.getComplexityColorClass(0)
+      })
+    }
+    try {
+      if (language === 'javascript') {
+        // function declarations
+        const fnDecl = /function\s+([A-Za-z_$][\w$]*)\s*\(/g
+        let m
+        while ((m = fnDecl.exec(code)) !== null) pushFn(m[1], m.index)
+
+        // named function expressions: const foo = function( ... ) or var foo = function
+        const namedFnExpr = /(const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*function\s*\(/g
+        while ((m = namedFnExpr.exec(code)) !== null) pushFn(m[2], m.index)
+
+        // arrow functions assigned to identifiers: const foo = (...) => { ... }
+        const arrowAssigned = /(const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*\([^)]*\)\s*=>/g
+        while ((m = arrowAssigned.exec(code)) !== null) pushFn(m[2], m.index)
+
+        // class methods: class X { methodName( ... ) { ... } }
+        const classMethod = /\n\s*([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*\{/g
+        while ((m = classMethod.exec(code)) !== null) pushFn(m[1], m.index)
+      }
+    } catch (e) {
+      // ignore
+    }
+    // Deduplicate by name:line
+    const unique = new Map()
+    results.forEach(f => {
+      const key = `${f.name}:${f.line}`
+      if (!unique.has(key)) unique.set(key, f)
+    })
+    return Array.from(unique.values())
   }
 
   calculateCppComplexity(code) {
@@ -1020,11 +1238,12 @@ class CodeLensAnalyzer {
       }
     }
     
+    const uniqueFunctions = this.dedupeFunctions(functions)
     return {
-      functions: functions,
+      functions: uniqueFunctions,
       overallScore: totalComplexity,
-      totalFunctions: functions.length,
-      averageComplexity: functions.length > 0 ? totalComplexity / functions.length : 0
+      totalFunctions: uniqueFunctions.length,
+      averageComplexity: uniqueFunctions.length > 0 ? totalComplexity / uniqueFunctions.length : 0
     }
   }
 
@@ -1185,9 +1404,7 @@ let analyzer
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     analyzer = new CodeLensAnalyzer()
-    analyzer.setup()
   })
 } else {
   analyzer = new CodeLensAnalyzer()
-  analyzer.setup()
 }

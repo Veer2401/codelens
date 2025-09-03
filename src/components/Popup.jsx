@@ -19,6 +19,16 @@ const Popup = () => {
   useEffect(() => {
     // Get current tab info and check if it's supported
     checkCurrentTab()
+
+    // Listen for live updates from content script
+    const listener = (message) => {
+      if (message && message.type === 'complexityDataUpdated' && message.data) {
+        setComplexityData(message.data)
+        setError(null)
+      }
+    }
+    chrome.runtime.onMessage.addListener(listener)
+    return () => chrome.runtime.onMessage.removeListener(listener)
   }, [])
 
   const checkCurrentTab = async () => {
@@ -47,11 +57,16 @@ const Popup = () => {
     
     const supportedSites = [
       'github.com',
+      'gist.github.com',
+      'gitlab.com',
+      'bitbucket.org',
       'codesandbox.io',
       'stackblitz.com',
       'replit.com',
       'jsfiddle.net',
-      'codepen.io'
+      'codepen.io',
+      'sourceforge.net',
+      'pastebin.com'
     ]
     
     return supportedSites.some(site => url.includes(site))
@@ -100,23 +115,16 @@ const Popup = () => {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
       if (tab) {
-        // First try to get existing data
-        try {
-          const response = await chrome.tabs.sendMessage(tab.id, { action: 'getComplexityData' })
-          if (response && response.success) {
-            setComplexityData(response.data)
-            setError(null)
-            return
-          }
-        } catch (e) {
-          // Content script not ready, continue with analysis
-        }
-
-        // Try to analyze code
+        // Always request a fresh analysis so functions populate
         const response = await chrome.tabs.sendMessage(tab.id, { action: 'analyzeCode' })
         if (response && response.success) {
           setComplexityData(response.data)
           setError(null)
+          // If still zero functions, try once more to force refresh
+          if (!response.data || (response.data.totalFunctions === 0 && response.data.functions?.length === 0)) {
+            const retry = await chrome.tabs.sendMessage(tab.id, { action: 'getComplexityData' })
+            if (retry && retry.success) setComplexityData(retry.data)
+          }
         } else if (response && response.error) {
           setError(response.error)
         } else {
