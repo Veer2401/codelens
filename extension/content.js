@@ -209,8 +209,7 @@ class CodeLensAnalyzer {
       })
     }
     
-    // Make widget draggable
-    this.makeWidgetDraggable(widget)
+    // Keep widget fixed in place (no dragging)
   }
 
   makeWidgetDraggable(widget) {

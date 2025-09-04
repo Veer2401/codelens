@@ -22,8 +22,8 @@
 }
 
 .codelens-widget:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  transform: none;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
 .widget-header {
@@ -33,7 +33,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  cursor: move;
+  cursor: default;
   user-select: none;
 }
 
