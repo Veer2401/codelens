@@ -55,7 +55,10 @@ const FunctionList = ({ functions }) => {
         >
           <div className="flex items-center justify-between mb-2">
             <div className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
-              {func.name || `Anonymous Function ${index + 1}`}
+              {(func.name || `Anonymous Function ${index + 1}`)}
+              {func.count && func.count > 1 && (
+                <span className="ml-2 text-xs text-gray-500">- {func.count}</span>
+              )}
             </div>
             <div className={`px-2 py-1 rounded-full text-xs font-medium ${getComplexityColor(func.complexity)}`}>
               {func.complexity}
@@ -64,8 +67,7 @@ const FunctionList = ({ functions }) => {
           
           <div className="flex items-center justify-between text-sm">
             <div className="text-gray-600">
-              Line {func.line}
-              {func.params && ` • ${func.params.length} params`}
+              {func.params && `${func.params.length} params`}
             </div>
             <div className={`text-xs font-medium ${getComplexityColor(func.complexity)}`}>
               {getComplexityLabel(func.complexity)}

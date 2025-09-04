@@ -20,6 +20,17 @@ class CodeLensAnalyzer {
     this.selectionTimer = null
     this.lastSelectedText = ''
     this.lastSelectedAt = 0
+    this.analysisQueued = false
+    this.reanalyzeTimer = null
+    this.lastPrimaryHash = ''
+    this.lastAnalyzeAt = 0
+    this.lastGoodComplexityData = null
+    this.userMinimized = false
+    this.showWidgetPos = null
+    try {
+      const saved = localStorage.getItem('codelens_show_pos')
+      if (saved) this.showWidgetPos = JSON.parse(saved)
+    } catch (_) {}
     
     this.init()
   }
@@ -305,23 +316,15 @@ class CodeLensAnalyzer {
     
     this.observer = new MutationObserver((mutations) => {
       let shouldReanalyze = false
-      
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-          // Check if new code blocks were added
-          mutation.addedNodes.forEach((node) => {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-              if (this.looksLikeCode(node) || node.querySelector && node.querySelector('code, pre, .CodeMirror-line')) {
-                shouldReanalyze = true
-              }
-            }
-          })
+      for (const mutation of mutations) {
+        if (mutation.type === 'childList') {
+          if (mutation.addedNodes && mutation.addedNodes.length > 0) shouldReanalyze = true
+          if (mutation.removedNodes && mutation.removedNodes.length > 0) shouldReanalyze = true
         }
-      })
-      
+        if (shouldReanalyze) break
+      }
       if (shouldReanalyze) {
-        console.log('CodeLens: DOM changed, reanalyzing...')
-        setTimeout(() => this.analyzePageCode(), 1000)
+        this.scheduleReanalyze()
       }
     })
     
@@ -331,8 +334,45 @@ class CodeLensAnalyzer {
     })
   }
 
+  scheduleReanalyze() {
+    if (this.reanalyzeTimer) clearTimeout(this.reanalyzeTimer)
+    this.reanalyzeTimer = setTimeout(() => {
+      // Skip if selection mode is active; selection handler will re-run
+      if (this.selectionActive) return
+      const { code } = this.getPrimaryCodeText()
+      const text = code || ''
+      // Require a reasonable amount of code to avoid transient empty states
+      if (text.trim().length < 30) return
+      // Rate-limit frequent re-analysis during scroll
+      if (Date.now() - this.lastAnalyzeAt < 1200) return
+      const hash = this.computeHash(text)
+      if (hash && hash === this.lastPrimaryHash) {
+        return
+      }
+      this.analyzePageCode()
+    }, 750)
+  }
+
+  computeHash(text) {
+    try {
+      let h = 0
+      for (let i = 0; i < text.length; i++) {
+        h = ((h << 5) - h) + text.charCodeAt(i)
+        h |= 0
+      }
+      return String(h)
+    } catch (_) {
+      return ''
+    }
+  }
+
   async analyzePageCode() {
     console.log('CodeLens: Starting code analysis...')
+    if (this.isAnalyzing) {
+      this.analysisQueued = true
+      return
+    }
+    this.isAnalyzing = true
     
     // Load Esprima if needed
     await this.loadEsprima()
@@ -360,11 +400,20 @@ class CodeLensAnalyzer {
     const { code: primaryCode, languageHint } = this.getPrimaryCodeText()
     if (!primaryCode || !primaryCode.trim()) {
       console.log('CodeLens: No primary code detected')
+      this.isAnalyzing = false
       return
     }
 
     this.analysisMode = 'full'
+    // Avoid re-analyzing if content unchanged
+    const currentHash = this.computeHash(primaryCode)
+    if (this.lastPrimaryHash && currentHash === this.lastPrimaryHash && this.complexityData.totalFunctions > 0) {
+      this.updateFloatingWidget()
+      this.isAnalyzing = false
+      return
+    }
     await this.analyzeCodeFromText(primaryCode, languageHint)
+    this.lastPrimaryHash = currentHash
     this.showFloatingWidget()
     
     console.log('CodeLens: Analysis complete:', this.complexityData)
@@ -377,11 +426,26 @@ class CodeLensAnalyzer {
 
     // Notify popup (if open)
     this.notifyPopupUpdate()
+    this.isAnalyzing = false
+    this.lastAnalyzeAt = Date.now()
+    if (this.analysisQueued) {
+      this.analysisQueued = false
+      this.scheduleReanalyze()
+    }
   }
 
   analyzeCodeFromText(code, languageHint) {
     return new Promise((resolve) => {
       try {
+        // Guard: preserve last good data if incoming text is too small or empty
+        if (!code || code.trim().length < 10) {
+          if (this.lastGoodComplexityData) {
+            this.complexityData = { ...this.lastGoodComplexityData }
+            this.updateFloatingWidget()
+            this.notifyPopupUpdate()
+          }
+          return resolve()
+        }
         const ext = this.getFileExtension()
         const detected = this.detectLanguage(ext ? `file.${ext}` : '', code)
         let language = languageHint || detected
@@ -401,6 +465,9 @@ class CodeLensAnalyzer {
           averageComplexity: uniqueFunctions.length > 0 ? totalComplexity / uniqueFunctions.length : 0,
           language: language,
           fileType: ext || 'unknown'
+        }
+        if (this.complexityData.totalFunctions > 0) {
+          this.lastGoodComplexityData = { ...this.complexityData }
         }
         console.log('CodeLens: Analysis (mode=' + this.analysisMode + ') complete:', this.complexityData)
         this.notifyPopupUpdate()
@@ -497,9 +564,13 @@ class CodeLensAnalyzer {
   dedupeFunctions(functions) {
     const map = new Map()
     functions.forEach(f => {
-      const key = `${f.name || 'anonymous'}:${f.line || 0}:${f.type || 'fn'}`
+      const name = (f.name || 'anonymous').trim()
+      const key = name.toLowerCase()
       if (!map.has(key)) {
-        map.set(key, f)
+        map.set(key, { ...f, name, count: f.count ? f.count : 1 })
+      } else {
+        const existing = map.get(key)
+        existing.count = (existing.count || 1) + (f.count ? f.count : 1)
       }
     })
     return Array.from(map.values())
@@ -905,14 +976,16 @@ class CodeLensAnalyzer {
 
   extractFunctionsBestEffort(code, language) {
     const results = []
-    const pushFn = (name, index) => {
+    const pushFn = (name, index, count = 1) => {
       results.push({
-        name: name || 'anonymous',
+        name: name ? name.trim() : 'anonymous',
         complexity: 0,
+        // we don't expose line numbers in UI anymore, keep for highlighting only
         line: code.substring(0, index).split('\n').length,
         type: 'function',
         label: this.getComplexityLabel(0),
-        colorClass: this.getComplexityColorClass(0)
+        colorClass: this.getComplexityColorClass(0),
+        count
       })
     }
     try {
@@ -930,9 +1003,30 @@ class CodeLensAnalyzer {
         const arrowAssigned = /(const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*\([^)]*\)\s*=>/g
         while ((m = arrowAssigned.exec(code)) !== null) pushFn(m[2], m.index)
 
-        // class methods: class X { methodName( ... ) { ... } }
-        const classMethod = /\n\s*([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*\{/g
-        while ((m = classMethod.exec(code)) !== null) pushFn(m[1], m.index)
+        // class/object methods: capture preceding newline or start
+        const classMethod = /(^|\n)\s*([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*\{/g
+        while ((m = classMethod.exec(code)) !== null) pushFn(m[2], m.index)
+
+        // loops (report once as "For loop as a whole" etc., no duplicates)
+        const loopCounts = new Map()
+        const loops = [
+          { regex: /for\s*\(/g, label: 'For loop as a whole' },
+          { regex: /while\s*\(/g, label: 'While loop as a whole' },
+          { regex: /do\s*\{/g, label: 'Do-while loop as a whole' }
+        ]
+        for (const l of loops) {
+          let lm
+          let firstIndex = -1
+          let count = 0
+          while ((lm = l.regex.exec(code)) !== null) {
+            if (firstIndex === -1) firstIndex = lm.index
+            count++
+          }
+          if (firstIndex !== -1) {
+            loopCounts.set(l.label, (loopCounts.get(l.label) || 0) + count)
+            pushFn(l.label, firstIndex, count)
+          }
+        }
       }
     } catch (e) {
       // ignore
@@ -1420,6 +1514,7 @@ class CodeLensAnalyzer {
 
   hideFloatingWidget() {
     if (this.floatingWidget) {
+      this.userMinimized = true
       this.floatingWidget.style.display = 'none'
       console.log('CodeLens: Floating widget hidden')
       
@@ -1430,10 +1525,13 @@ class CodeLensAnalyzer {
 
   showFloatingWidget() {
     if (this.floatingWidget) {
+      if (this.userMinimized) {
+        // Keep minimized; ensure the show button is visible
+        this.createShowWidgetButton()
+        return
+      }
       this.floatingWidget.style.display = 'block'
       console.log('CodeLens: Floating widget shown')
-      
-      // Remove the show widget button if it exists
       this.removeShowWidgetButton()
     }
   }
@@ -1448,16 +1546,68 @@ class CodeLensAnalyzer {
     showBtn.innerHTML = '🔍'
     showBtn.title = 'Show CodeLens Widget'
     
-    // Position it where the widget was
-    if (this.floatingWidget) {
-      const rect = this.floatingWidget.getBoundingClientRect()
-      showBtn.style.left = (rect.right - 40) + 'px'
-      showBtn.style.top = rect.top + 'px'
+    // Positioning: use saved position if available, else default top-right
+    if (this.showWidgetPos && typeof this.showWidgetPos.top === 'number' && typeof this.showWidgetPos.left === 'number') {
+      showBtn.style.top = this.showWidgetPos.top + 'px'
+      showBtn.style.left = this.showWidgetPos.left + 'px'
+      showBtn.style.right = ''
+    } else {
+      showBtn.style.top = '80px'
+      showBtn.style.right = '20px'
+      showBtn.style.left = ''
     }
     
     showBtn.addEventListener('click', () => {
+      this.userMinimized = false
       this.showFloatingWidget()
     })
+
+    // Make the circle draggable
+    let dragging = false
+    let startX = 0
+    let startY = 0
+    let startLeft = 0
+    let startTop = 0
+    const onMouseDown = (e) => {
+      // Begin drag only for primary click and when not on a link
+      if (e.button !== 0) return
+      dragging = true
+      const rect = showBtn.getBoundingClientRect()
+      // Ensure left-based positioning during drag
+      showBtn.style.left = rect.left + 'px'
+      showBtn.style.top = rect.top + 'px'
+      showBtn.style.right = ''
+      startX = e.clientX
+      startY = e.clientY
+      startLeft = rect.left
+      startTop = rect.top
+      document.addEventListener('mousemove', onMouseMove)
+      document.addEventListener('mouseup', onMouseUp)
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
+    const onMouseMove = (e) => {
+      if (!dragging) return
+      const deltaX = e.clientX - startX
+      const deltaY = e.clientY - startY
+      // Match the .codelens-show-widget size (56px) and 4px margin
+      const newLeft = clamp(startLeft + deltaX, 0, window.innerWidth - 56 - 4)
+      const newTop = clamp(startTop + deltaY, 0, window.innerHeight - 56 - 4)
+      showBtn.style.left = newLeft + 'px'
+      showBtn.style.top = newTop + 'px'
+    }
+    const onMouseUp = () => {
+      if (!dragging) return
+      dragging = false
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onMouseUp)
+      // Persist position for this session and future pages
+      const rect = showBtn.getBoundingClientRect()
+      this.showWidgetPos = { top: rect.top, left: rect.left }
+      try { localStorage.setItem('codelens_show_pos', JSON.stringify(this.showWidgetPos)) } catch (_) {}
+    }
+    showBtn.addEventListener('mousedown', onMouseDown)
     
     document.body.appendChild(showBtn)
     this.showWidgetButton = showBtn
