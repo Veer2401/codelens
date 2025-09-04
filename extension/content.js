@@ -39,8 +39,13 @@ class CodeLensAnalyzer {
   async loadEsprima() {
     if (this.esprimaLoaded) return
     try {
-      // Load bundled esprima from extension package to satisfy CSP
-      const url = chrome.runtime.getURL('assets/esprima.min.js')
+      // If preloaded by manifest, esprima should already be present
+      if (typeof window.esprima !== 'undefined') {
+        this.esprimaLoaded = true
+        return
+      }
+      // Fallback: load bundled esprima from extension package to satisfy CSP
+      const url = chrome.runtime.getURL('assets/esprima.js')
       await new Promise((resolve, reject) => {
         const script = document.createElement('script')
         script.src = url
@@ -379,7 +384,13 @@ class CodeLensAnalyzer {
       try {
         const ext = this.getFileExtension()
         const detected = this.detectLanguage(ext ? `file.${ext}` : '', code)
-        const language = languageHint || detected
+        let language = languageHint || detected
+        // Force JSX/TSX to JSX fallback and TS to fallback when annotations present
+        if (ext === 'jsx' || ext === 'tsx' || this.isProbablyJSX(code)) {
+          language = 'jsx'
+        } else if (ext === 'ts' || this.isProbablyTypeScript(code)) {
+          language = 'typescript'
+        }
         const result = this.calculateComplexityForLanguage(code, language)
         const uniqueFunctions = this.dedupeFunctions(result.functions)
         const totalComplexity = uniqueFunctions.reduce((sum, f) => sum + (f.complexity || 0), 0)
@@ -649,7 +660,7 @@ class CodeLensAnalyzer {
         'js': 'javascript',
         'jsx': 'jsx',
         'ts': 'typescript',
-        'tsx': 'typescript',
+        'tsx': 'jsx',
         'cpp': 'cpp',
         'cc': 'cpp',
         'cxx': 'cpp',
@@ -724,10 +735,18 @@ class CodeLensAnalyzer {
   calculateComplexityForLanguage(code, language) {
     switch (language) {
       case 'javascript':
+        // If the source looks like JSX or TypeScript, avoid Esprima and fallback
+        if (this.isProbablyJSX(code) || this.isProbablyTypeScript(code)) {
+          const fns = this.extractFunctionsBestEffort(code, 'javascript')
+          return { functions: fns, overallScore: 0, totalFunctions: fns.length, averageComplexity: 0 }
+        }
+        return this.calculateJavaScriptComplexity(code)
       case 'jsx':
       case 'typescript':
       case 'tsx':
-        return this.calculateJavaScriptComplexity(code)
+        // Use best-effort parsing for JSX/TS/TSX to avoid Esprima parse errors
+        const fns = this.extractFunctionsBestEffort(code, 'javascript')
+        return { functions: fns, overallScore: 0, totalFunctions: fns.length, averageComplexity: 0 }
       case 'cpp':
       case 'c':
         return this.calculateCppComplexity(code)
@@ -744,7 +763,35 @@ class CodeLensAnalyzer {
     }
   }
 
+  isProbablyJSX(code) {
+    try {
+      // Heuristic: angle-bracket tags that are not part of comparisons
+      if ((/<[A-Za-z][A-Za-z0-9]*\s[^>]*>/).test(code) || (/<[A-Za-z][A-Za-z0-9]*>/).test(code)) {
+        if ((/<\/[A-Za-z]/).test(code)) return true
+      }
+      if (/return\s*\(\s*<\w+/m.test(code)) return true
+    } catch (_) {}
+    return false
+  }
+
+  isProbablyTypeScript(code) {
+    try {
+      if (/\binterface\s+\w+/.test(code)) return true
+      if (/\btype\s+\w+\s*=/.test(code)) return true
+      if (/\benum\s+\w+/.test(code)) return true
+      if (/\bimport\s+type\b/.test(code)) return true
+      // Parameter or variable type annotations
+      if (/[),\w]\s*:\s*[A-Za-z][A-Za-z0-9_<>{}\[\]\|&?, ]+/.test(code)) return true
+    } catch (_) {}
+    return false
+  }
+
   calculateJavaScriptComplexity(code) {
+    // Guard: if this looks like JSX or TypeScript, avoid Esprima and fallback
+    if (this.isProbablyJSX(code) || this.isProbablyTypeScript(code)) {
+      const fns = this.extractFunctionsBestEffort(code, 'javascript')
+      return { functions: fns, overallScore: 0, totalFunctions: fns.length, averageComplexity: 0 }
+    }
     if (!this.esprimaLoaded) {
       console.log('CodeLens: Esprima not loaded yet, waiting...')
       return { functions: [], overallScore: 0 }
@@ -755,7 +802,7 @@ class CodeLensAnalyzer {
       const functions = []
       let totalComplexity = 0
 
-      const traverse = (node) => {
+      const traverse = (node, parent) => {
         if (node.type === 'FunctionDeclaration' || node.type === 'FunctionExpression' || 
             node.type === 'ArrowFunctionExpression' || node.type === 'MethodDefinition') {
           let complexity = 1 // Base complexity
@@ -785,8 +832,31 @@ class CodeLensAnalyzer {
           
           countDecisions(node)
           
-          const functionName = node.id ? node.id.name : 
-                             (node.key ? node.key.name : 'anonymous')
+          let functionName = 'anonymous'
+          try {
+            if (node.id && node.id.name) {
+              functionName = node.id.name
+            } else if (node.key && typeof node.key === 'object') {
+              if (node.key.name) functionName = node.key.name
+              else if (Object.prototype.hasOwnProperty.call(node.key, 'value')) functionName = String(node.key.value)
+            } else if ((node.type === 'FunctionExpression' || node.type === 'ArrowFunctionExpression') && parent) {
+              if (parent.type === 'VariableDeclarator' && parent.id && parent.id.name) {
+                functionName = parent.id.name
+              } else if (parent.type === 'AssignmentExpression') {
+                const left = parent.left
+                if (left && left.type === 'Identifier' && left.name) functionName = left.name
+                else if (left && left.type === 'MemberExpression' && left.property) {
+                  if (left.property.name) functionName = left.property.name
+                  else if (typeof left.property.value !== 'undefined') functionName = String(left.property.value)
+                }
+              } else if (parent.type === 'Property' && parent.key) {
+                if (parent.key.name) functionName = parent.key.name
+                else if (Object.prototype.hasOwnProperty.call(parent.key, 'value')) functionName = String(parent.key.value)
+              }
+            }
+          } catch (_) {
+            // keep anonymous
+          }
           
           functions.push({
             name: functionName,
@@ -804,15 +874,15 @@ class CodeLensAnalyzer {
         Object.keys(node).forEach(key => {
           if (node[key] && typeof node[key] === 'object') {
             if (Array.isArray(node[key])) {
-              node[key].forEach(traverse)
+              node[key].forEach(child => traverse(child, node))
             } else {
-              traverse(node[key])
+              traverse(node[key], node)
             }
           }
         })
       }
       
-      traverse(ast)
+      traverse(ast, null)
       
       return {
         functions: functions,
@@ -821,7 +891,7 @@ class CodeLensAnalyzer {
         averageComplexity: functions.length > 0 ? totalComplexity / functions.length : 0
       }
     } catch (error) {
-      console.error('CodeLens: Error parsing JavaScript:', error)
+      console.warn('CodeLens: JavaScript parsing failed, using fallback.')
       // Fallback: best-effort regex extraction so Functions tab still shows entries
       const fallbackFunctions = this.extractFunctionsBestEffort(code, 'javascript')
       return {

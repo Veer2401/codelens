@@ -41,7 +41,7 @@
         "https://pastebin.com/*",
         "https://gist.github.com/*"
       ],
-      "js": ["content.js"],
+      "js": ["assets/esprima.js", "content.js"],
       "css": ["content.css"],
       "run_at": "document_end"
     }
@@ -52,7 +52,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["widget.html", "widget.css", "widget.js", "assets/esprima.min.js"],
+      "resources": ["widget.html", "widget.css", "widget.js", "assets/esprima.js"],
       "matches": ["<all_urls>"]
     }
   ]

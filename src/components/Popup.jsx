@@ -203,6 +203,8 @@ const Popup = () => {
     }
   }
 
+  
+
   return (
     <div className="w-96 h-[600px] bg-white">
       {/* Header */}
