@@ -22,7 +22,7 @@ const ComplexityChart = ({ functions }) => {
   const maxCount = Math.max(...Object.values(complexityRanges))
   const colors = {
     '1-5': 'bg-complexity-low',
-    '6-10': 'bg-complexity-medium',
+    '6-10': 'bg-complexity-low',
     '11-15': 'bg-complexity-high',
     '16+': 'bg-complexity-extreme'
   }
@@ -31,8 +31,7 @@ const ComplexityChart = ({ functions }) => {
   const bubbleData = functions.slice(0, 20).map((func, index) => ({
     ...func,
     size: Math.max(20, Math.min(60, func.complexity * 3)),
-    color: func.complexity <= 5 ? 'bg-complexity-low' :
-           func.complexity <= 10 ? 'bg-complexity-medium' :
+    color: func.complexity <= 10 ? 'bg-complexity-low' :
            func.complexity <= 15 ? 'bg-complexity-high' : 'bg-complexity-extreme'
   }))
 
@@ -85,7 +84,7 @@ const ComplexityChart = ({ functions }) => {
               <span className="text-gray-600">Low</span>
             </div>
             <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-complexity-medium rounded-full"></div>
+              <div className="w-3 h-3 bg-complexity-low rounded-full"></div>
               <span className="text-gray-600">Medium</span>
             </div>
             <div className="flex items-center space-x-1">

@@ -2,8 +2,7 @@ import React from 'react'
 
 const FunctionList = ({ functions }) => {
   const getComplexityColor = (complexity) => {
-    if (complexity <= 5) return 'text-complexity-low bg-complexity-low/10'
-    if (complexity <= 10) return 'text-complexity-medium bg-complexity-medium/10'
+    if (complexity <= 10) return 'text-complexity-low bg-complexity-low/10'
     if (complexity <= 15) return 'text-complexity-high bg-complexity-high/10'
     return 'text-complexity-extreme bg-complexity-extreme/10'
   }

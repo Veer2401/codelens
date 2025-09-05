@@ -144,8 +144,7 @@ const Popup = () => {
   }
 
   const getScoreColor = (score) => {
-    if (score <= 5) return 'text-complexity-low'
-    if (score <= 10) return 'text-complexity-medium'
+    if (score <= 10) return 'text-complexity-low'
     if (score <= 15) return 'text-complexity-high'
     return 'text-complexity-extreme'
   }
