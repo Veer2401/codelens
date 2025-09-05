@@ -16,6 +16,21 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 })
 
+// Supported sites (must match manifest host_permissions)
+const SUPPORTED_SITES = [
+  'github.com',
+  'codesandbox.io',
+  'stackblitz.com',
+  'replit.com',
+  'jsfiddle.net',
+  'codepen.io',
+  'gitlab.com',
+  'bitbucket.org',
+  'sourceforge.net',
+  'pastebin.com',
+  'gist.github.com'
+]
+
 // Handle messages from content scripts and popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   switch (request.action) {
@@ -78,25 +93,74 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Analyze a specific tab
 async function analyzeTab(tabId) {
   try {
-    await chrome.tabs.sendMessage(tabId, { action: 'analyzeCode' })
+    const tab = await chrome.tabs.get(tabId)
+    const url = tab && tab.url ? tab.url : ''
+    const isSupported = url && SUPPORTED_SITES.some(site => url.includes(site))
+    if (!isSupported) return
+
+    await ensureContentScript(tabId)
+    await sendMessageWithRetry(tabId, { action: 'analyzeCode' }, 1)
   } catch (error) {
     console.error('Error analyzing tab:', error)
+  }
+}
+
+// Ensure content script is present; if not, inject it
+async function ensureContentScript(tabId) {
+  // Try a lightweight ping first
+  try {
+    await chrome.tabs.sendMessage(tabId, { action: 'ping' })
+    return
+  } catch (e) {
+    // proceed to inject
+  }
+
+  try {
+    // Inject CSS first
+    await chrome.scripting.insertCSS({
+      target: { tabId },
+      files: ['content.css']
+    }).catch(() => {})
+
+    // Inject dependencies then content script
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      files: ['assets/esprima.js']
+    })
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      files: ['content.js']
+    })
+
+    // Give the content script a brief moment to initialize, then verify with ping
+    await new Promise(r => setTimeout(r, 200))
+    await chrome.tabs.sendMessage(tabId, { action: 'ping' })
+  } catch (err) {
+    console.warn('Failed to inject content scripts:', err)
+  }
+}
+
+// Send a message and, on missing receiver, ensure injection and retry once
+async function sendMessageWithRetry(tabId, message, retries = 1) {
+  try {
+    await chrome.tabs.sendMessage(tabId, message)
+  } catch (err) {
+    const msg = (err && err.message) || ''
+    const missingReceiver = msg.includes('Receiving end does not exist') || msg.includes('Could not establish connection')
+    if (missingReceiver && retries > 0) {
+      await ensureContentScript(tabId)
+      // small wait to allow listeners to attach
+      await new Promise(r => setTimeout(r, 100))
+      return sendMessageWithRetry(tabId, message, retries - 1)
+    }
+    throw err
   }
 }
 
 // Handle tab updates to auto-analyze when navigating to supported sites
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url) {
-    const supportedSites = [
-      'github.com',
-      'codesandbox.io',
-      'stackblitz.com',
-      'replit.com',
-      'jsfiddle.net',
-      'codepen.io'
-    ]
-    
-    const isSupported = supportedSites.some(site => tab.url.includes(site))
+    const isSupported = SUPPORTED_SITES.some(site => tab.url.includes(site))
     
     if (isSupported) {
       // Check if auto-analyze is enabled
@@ -117,16 +181,7 @@ chrome.action.onClicked.addListener((tab) => {
   // This will only trigger if no popup is set
   // For now, we'll just analyze the current tab
   if (tab.url) {
-    const supportedSites = [
-      'github.com',
-      'codesandbox.io',
-      'stackblitz.com',
-      'replit.com',
-      'jsfiddle.net',
-      'codepen.io'
-    ]
-    
-    const isSupported = supportedSites.some(site => tab.url.includes(site))
+    const isSupported = SUPPORTED_SITES.some(site => tab.url.includes(site))
     
     if (isSupported) {
       analyzeTab(tab.id)
@@ -175,26 +230,11 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   switch (info.menuItemId) {
     case 'codelens-analyze':
-      // Send message to content script to analyze code
-      chrome.tabs.sendMessage(tab.id, { action: 'analyzeCode' }).catch(() => {
-        // If content script not ready, show notification
-        chrome.notifications.create({
-          type: 'basic',
-          title: 'CodeLens - Complexity Visualizer',
-          message: 'Please refresh the page and try again to analyze code.'
-        })
-      })
+      analyzeTab(tab.id)
       break
       
     case 'codelens-toggle-widget':
-      // Toggle widget visibility
-      chrome.tabs.sendMessage(tab.id, { action: 'toggleWidget' }).catch(() => {
-        chrome.notifications.create({
-          type: 'basic',
-          title: 'CodeLens - Complexity Visualizer',
-          message: 'Please refresh the page and try again to toggle widget.'
-        })
-      })
+      sendMessageWithRetry(tab.id, { action: 'toggleWidget' }, 1).catch(() => {})
       break
       
     case 'codelens-about':
@@ -215,16 +255,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach(tab => {
         if (tab.url) {
-          const supportedSites = [
-            'github.com',
-            'codesandbox.io',
-            'stackblitz.com',
-            'replit.com',
-            'jsfiddle.net',
-            'codepen.io'
-          ]
-          
-          const isSupported = supportedSites.some(site => tab.url.includes(site))
+          const isSupported = SUPPORTED_SITES.some(site => tab.url.includes(site))
           
           if (isSupported) {
             chrome.tabs.sendMessage(tab.id, {

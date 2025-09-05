@@ -35,7 +35,7 @@ const FunctionList = ({ functions }) => {
       <div className="text-center py-8 text-gray-500">
         <div className="text-4xl mb-2">🔍</div>
         <div className="text-sm">No functions analyzed yet</div>
-        <div className="text-xs mt-1">Click "Analyze" to start</div>
+        {/* <div className="text-xs mt-1">Click "Analyze" to start</div> */}
       </div>
     )
   }

@@ -294,6 +294,7 @@ class CodeLensAnalyzer {
     // Detect presence of common code containers or known file extensions
     const knownSelectors = [
       '.blob-code-inner',
+      '.blob-code',
       '.highlight .blob-code',
       '.js-file-line',
       '.CodeMirror-line',
@@ -481,9 +482,15 @@ class CodeLensAnalyzer {
 
   getPrimaryCodeText() {
     // Try GitHub file view lines
-    const ghLines = document.querySelectorAll('.blob-code-inner')
+    let ghLines = document.querySelectorAll('.blob-code-inner')
     if (ghLines && ghLines.length > 0) {
       const code = Array.from(ghLines).map(n => n.textContent || '').join('\n')
+      return { code, languageHint: this.detectLanguage(`file.${this.getFileExtension()}`, code) }
+    }
+    // Fallback: older/new GitHub markup
+    const ghLinesAlt = document.querySelectorAll('.blob-code')
+    if (ghLinesAlt && ghLinesAlt.length > 0) {
+      const code = Array.from(ghLinesAlt).map(n => n.textContent || '').join('\n')
       return { code, languageHint: this.detectLanguage(`file.${this.getFileExtension()}`, code) }
     }
     // Monaco-based editors
@@ -603,7 +610,7 @@ class CodeLensAnalyzer {
 
     // Last resort: page title scan
     const title = document.title.toLowerCase()
-    const known = ['js','jsx','ts','tsx','cpp','c','java','py','html','css']
+    const known = ['js','jsx','ts','tsx','cpp','c','java','py','pyw','html','css']
     for (const ext of known) {
       if (title.includes('.' + ext)) return ext
     }
@@ -784,10 +791,9 @@ class CodeLensAnalyzer {
         return 'css'
       }
       
-      // Python detection
-      if (content.includes('def ') && content.includes(':') && content.includes('import ')) {
-        return 'python'
-      }
+      // Python detection (relaxed)
+      if (/\bdef\s+[A-Za-z_][A-Za-z0-9_]*\s*\([^)]*\)\s*:/m.test(content)) return 'python'
+      if (/\bclass\s+[A-Za-z_][A-Za-z0-9_]*\s*:\s*/m.test(content)) return 'python'
       
       // Java detection
       if (content.includes('public class') || content.includes('private class') || content.includes('import java.')) {
@@ -976,15 +982,64 @@ class CodeLensAnalyzer {
 
   extractFunctionsBestEffort(code, language) {
     const results = []
-    const pushFn = (name, index, count = 1) => {
+    const computeJSHeuristicComplexity = (source, fromIndex) => {
+      try {
+        const slice = source.substring(fromIndex)
+        // Find the first '{' after the function signature
+        const braceIdx = slice.indexOf('{')
+        let body = ''
+        if (braceIdx !== -1) {
+          // Balanced brace scan
+          let depth = 0
+          let started = false
+          for (let i = braceIdx; i < slice.length; i++) {
+            const ch = slice[i]
+            if (ch === '{') { depth++; started = true }
+            if (ch === '}') depth--
+            body += ch
+            if (started && depth === 0) break
+          }
+        } else {
+          // Arrow one-liner: find end of line or semicolon
+          const arrowIdx = slice.indexOf('=>')
+          if (arrowIdx !== -1) {
+            const after = slice.substring(arrowIdx + 2)
+            const nl = after.indexOf('\n')
+            const semi = after.indexOf(';')
+            const end = [nl === -1 ? Infinity : nl, semi === -1 ? Infinity : semi].reduce((a,b)=>Math.min(a,b), Infinity)
+            body = end === Infinity ? after : after.substring(0, end)
+          } else {
+            // Fallback limited window
+            body = slice.substring(0, 300)
+          }
+        }
+        let complexity = 1
+        const add = (re) => { const m = body.match(re); if (m) complexity += m.length }
+        add(/\bif\s*\(/g)
+        add(/\bfor\s*\(/g)
+        add(/\bwhile\s*\(/g)
+        add(/\bswitch\s*\(/g)
+        add(/\bcase\b/g)
+        add(/\bcatch\s*\(/g)
+        add(/\?/g) // ternary
+        add(/&&/g)
+        add(/\|\|/g)
+        return complexity
+      } catch (_) { return 1 }
+    }
+    const pushFn = (name, index, count = 1, opts = {}) => {
+      let complexity = 0
+      if (language === 'javascript' && !opts.isLoopAggregate) {
+        complexity = computeJSHeuristicComplexity(code, index)
+      }
+      const line = code.substring(0, index).split('\n').length
       results.push({
         name: name ? name.trim() : 'anonymous',
-        complexity: 0,
-        // we don't expose line numbers in UI anymore, keep for highlighting only
-        line: code.substring(0, index).split('\n').length,
+        complexity: complexity,
+        line: line,
         type: 'function',
-        label: this.getComplexityLabel(0),
-        colorClass: this.getComplexityColorClass(0),
+        label: this.getComplexityLabel(complexity),
+        colorClass: this.getComplexityColorClass(complexity),
         count
       })
     }
@@ -1024,7 +1079,7 @@ class CodeLensAnalyzer {
           }
           if (firstIndex !== -1) {
             loopCounts.set(l.label, (loopCounts.get(l.label) || 0) + count)
-            pushFn(l.label, firstIndex, count)
+            pushFn(l.label, firstIndex, count, { isLoopAggregate: true })
           }
         }
       }
@@ -1196,30 +1251,40 @@ class CodeLensAnalyzer {
     const functions = []
     let totalComplexity = 0
     
-    // Python function detection
-    const functionRegex = /def\s+(\w+)\s*\([^)]*\)\s*:/g
-    const ifRegex = /if\s+/g
-    const forRegex = /for\s+/g
-    const whileRegex = /while\s+/g
-    const exceptRegex = /except\s+/g
-    const elifRegex = /elif\s+/g
+    // Python function detection (support decorators and indentation blocks)
+    const functionRegex = /(?:^|\n)\s*(?:@[A-Za-z_][\w.]*\s*\n\s*)*def\s+([A-Za-z_][A-Za-z0-9_]*)\s*\([^)]*\)\s*:\s*(?:#.*)?/g
+    const ifRegex = /\bif\b/g
+    const forRegex = /\bfor\b/g
+    const whileRegex = /\bwhile\b/g
+    const exceptRegex = /\bexcept\b/g
+    const elifRegex = /\belif\b/g
+    const andOrRegex = /\b(and|or)\b/g
+    const tryRegex = /\btry\b/g
+    const withRegex = /\bwith\b/g
     
     let match
     
     while ((match = functionRegex.exec(code)) !== null) {
       const functionName = match[1]
       const functionStart = match.index
-      
-      // Find function end (simplified - look for next function or end of indentation)
-      let functionEnd = code.length
+      const before = code.substring(0, functionStart)
+      const functionLineIndex = before.split('\n').length - 1
+      // Determine indentation level of the def line
+      const defLine = code.substring(functionStart, code.indexOf('\n', functionStart) === -1 ? code.length : code.indexOf('\n', functionStart))
+      const indentMatch = defLine.match(/^(\s*)/)
+      const baseIndent = indentMatch ? indentMatch[1] : ''
+      const baseIndentLen = baseIndent.length
+      // Scan forward until a line with indentation <= baseIndent (new block) or EOF
       const lines = code.split('\n')
-      const functionLineIndex = code.substring(0, functionStart).split('\n').length - 1
-      
+      let functionEnd = code.length
       for (let i = functionLineIndex + 1; i < lines.length; i++) {
         const line = lines[i]
-        if (line.trim() === '' || line.match(/^def\s+/) || 
-            (line.match(/^\S/) && !line.startsWith(' '))) {
-          functionEnd = code.indexOf('\n', code.indexOf('\n', functionStart) + 1)
+        // Blank/comment-only lines are part of the function
+        if (line.trim() === '' || /^\s*#/.test(line)) continue
+        const indentLen = (line.match(/^(\s*)/) || ['',''])[1].length
+        if (indentLen <= baseIndentLen && !/^\s*(elif|else|except|finally)\b/.test(line)) {
+          // Block ended; stop before this line
+          functionEnd = before.length + lines.slice(0, i).join('\n').length + (i > 0 ? 1 : 0)
           break
         }
       }
@@ -1230,10 +1295,13 @@ class CodeLensAnalyzer {
         
         // Count decision points
         complexity += (functionCode.match(ifRegex) || []).length
+        complexity += (functionCode.match(elifRegex) || []).length
         complexity += (functionCode.match(forRegex) || []).length
         complexity += (functionCode.match(whileRegex) || []).length
         complexity += (functionCode.match(exceptRegex) || []).length
-        complexity += (functionCode.match(elifRegex) || []).length
+        complexity += (functionCode.match(tryRegex) || []).length
+        complexity += (functionCode.match(withRegex) || []).length
+        complexity += (functionCode.match(andOrRegex) || []).length
         
         functions.push({
           name: functionName,

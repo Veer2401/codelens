@@ -8,7 +8,8 @@
     "tabs",
     "storage",
     "contextMenus",
-    "notifications"
+    "notifications",
+    "scripting"
   ],
   "host_permissions": [
     "https://github.com/*",
@@ -43,7 +44,9 @@
       ],
       "js": ["assets/esprima.js", "content.js"],
       "css": ["content.css"],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "all_frames": true,
+      "match_about_blank": true
     }
   ],
   "action": {
