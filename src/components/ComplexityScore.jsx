@@ -26,7 +26,10 @@ const ComplexityScore = ({ score, label, colorClass }) => {
         {score <= 5 && "Excellent - Keep it up!"}
         {score > 5 && score <= 10 && "Good - Consider some improvements"}
         {score > 10 && score <= 15 && "Fair - Needs refactoring"}
-        {score > 15 && "Poor - Major refactoring required"}
+        {score > 15 && score <= 20 && "Fair - Needs refactoring"}
+        {score > 20 && score <=35 && "Fair - Needs refactoring"}
+        {score > 35 && "Poor - Major refactoring required"}
+
       </div>
     </div>
   )
