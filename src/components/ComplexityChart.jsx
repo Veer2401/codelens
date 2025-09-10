@@ -23,8 +23,11 @@ const ComplexityChart = ({ functions }) => {
   const colors = {
     '1-5': 'bg-complexity-low',
     '6-10': 'bg-complexity-low',
-    '11-15': 'bg-complexity-high',
-    '16+': 'bg-complexity-extreme'
+    '11-15': 'bg-complexity-low',
+    '16-20': 'bg-complexity-high',
+    '21-25': 'bg-complexity-high',
+    '26-30': 'bg-complexity-extreme'
+
   }
 
   // Bubble chart data

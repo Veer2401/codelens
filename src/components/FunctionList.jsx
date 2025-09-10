@@ -1,6 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 const FunctionList = ({ functions }) => {
+  const [highlightingFunction, setHighlightingFunction] = useState(null)
+  const [highlightError, setHighlightError] = useState(null)
+
   const getComplexityColor = (complexity) => {
     if (complexity <= 10) return 'text-complexity-low bg-complexity-low/10'
     if (complexity <= 15) return 'text-complexity-high bg-complexity-high/10'
@@ -15,17 +18,29 @@ const FunctionList = ({ functions }) => {
   }
 
   const handleFunctionClick = async (func) => {
+    setHighlightingFunction(func.name)
+    setHighlightError(null)
+    
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
       if (tab) {
-        await chrome.tabs.sendMessage(tab.id, {
+        const response = await chrome.tabs.sendMessage(tab.id, {
           action: 'highlightFunction',
           functionName: func.name,
           line: func.line
         })
+        
+        if (response && !response.success) {
+          setHighlightError(response.error || 'Failed to highlight function')
+        }
+      } else {
+        setHighlightError('No active tab found')
       }
     } catch (error) {
       console.error('Error highlighting function:', error)
+      setHighlightError('Failed to communicate with content script')
+    } finally {
+      setHighlightingFunction(null)
     }
   }
 
@@ -46,17 +61,29 @@ const FunctionList = ({ functions }) => {
         <span className="text-xs">Click function to highlight in code</span>
       </div>
       
+      {highlightError && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+          <div className="font-medium">Highlight Error:</div>
+          <div>{highlightError}</div>
+        </div>
+      )}
+      
       {functions.map((func, index) => (
         <div
           key={index}
-          className="border border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors cursor-pointer group"
+          className={`border border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors cursor-pointer group ${
+            highlightingFunction === func.name ? 'bg-blue-50 border-blue-300' : ''
+          }`}
           onClick={() => handleFunctionClick(func)}
         >
           <div className="flex items-center justify-between mb-2">
-            <div className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+            <div className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors flex items-center">
               {(func.name || `Anonymous Function ${index + 1}`)}
               {func.count && func.count > 1 && (
                 <span className="ml-2 text-xs text-gray-500">- {func.count}</span>
+              )}
+              {highlightingFunction === func.name && (
+                <span className="ml-2 text-xs text-blue-600">⏳ Highlighting...</span>
               )}
             </div>
             <div className={`px-2 py-1 rounded-full text-xs font-medium ${getComplexityColor(func.complexity)}`}>

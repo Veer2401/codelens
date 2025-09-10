@@ -112,8 +112,13 @@ class CodeLensAnalyzer {
           
         case 'highlightFunction':
           console.log('CodeLens: Highlighting function:', request.functionName)
-          this.highlightFunctionByName(request.functionName, request.line)
-          sendResponse({ success: true })
+          try {
+            this.highlightFunctionByName(request.functionName, request.line)
+            sendResponse({ success: true })
+          } catch (error) {
+            console.error('CodeLens: Error highlighting function:', error)
+            sendResponse({ success: false, error: error.message })
+          }
           return true
           
         case 'ping':
@@ -1497,32 +1502,75 @@ class CodeLensAnalyzer {
   }
 
   highlightAllFunctions() {
+    console.log('CodeLens: Highlighting all functions...')
     this.clearHighlights()
     
     this.complexityData.functions.forEach(func => {
       this.highlightFunction(func)
     })
+    
+    console.log('CodeLens: Highlighted', this.highlightedElements.size, 'function elements')
   }
 
   highlightFunction(func) {
+    console.log('CodeLens: Highlighting function:', func.name, 'with complexity:', func.complexity)
+    
     const codeBlocks = this.findCodeBlocks()
+    let highlighted = false
     
     for (const block of codeBlocks) {
       const text = block.textContent || block.innerText || ''
-      if (text.includes(func.name)) {
+      
+      // More precise function name matching
+      const functionName = func.name.trim()
+      if (this.findFunctionInText(text, functionName)) {
+        console.log('CodeLens: Found function in code block, highlighting...')
         const container = this.findHighlightContainer(block)
         
         // Add complexity class
         const complexityClass = this.getComplexityColorClass(func.complexity)
         container.classList.add('complexity-highlight', complexityClass)
         
+        // Add language-specific data attribute
+        container.setAttribute('data-language', this.complexityData.language || 'unknown')
+        
         // Add tooltip
         container.title = `${func.name}: ${func.complexity} complexity (${func.label})`
         
         this.highlightedElements.add(container)
+        highlighted = true
         break
       }
     }
+    
+    if (!highlighted) {
+      console.warn('CodeLens: Could not find function in any code blocks:', func.name)
+    }
+  }
+  
+  findFunctionInText(text, functionName) {
+    if (!text || !functionName) return false
+    
+    // Create more precise regex patterns for different function types
+    const patterns = [
+      // Function declarations: function functionName(
+      new RegExp(`\\bfunction\\s+${this.escapeRegex(functionName)}\\s*\\(`, 'g'),
+      // Arrow functions: const functionName = ( or let functionName = (
+      new RegExp(`\\b(const|let|var)\\s+${this.escapeRegex(functionName)}\\s*=\\s*\\(`, 'g'),
+      // Method definitions: functionName( or functionName: function
+      new RegExp(`\\b${this.escapeRegex(functionName)}\\s*\\(`, 'g'),
+      // Class methods: functionName( or functionName: function
+      new RegExp(`\\b${this.escapeRegex(functionName)}\\s*[:=]\\s*function`, 'g'),
+      // Arrow function assignments: functionName = (params) =>
+      new RegExp(`\\b${this.escapeRegex(functionName)}\\s*=\\s*\\([^)]*\\)\\s*=>`, 'g')
+    ]
+    
+    // Check if any pattern matches
+    return patterns.some(pattern => pattern.test(text))
+  }
+  
+  escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   }
 
   findHighlightContainer(element) {
@@ -1561,11 +1609,17 @@ class CodeLensAnalyzer {
   }
 
   highlightFunctionByName(functionName, lineNumber) {
+    console.log('CodeLens: Attempting to highlight function:', functionName, 'at line:', lineNumber)
+    
+    // Clear any existing highlights first
+    this.clearHighlights()
+    
     const func = this.complexityData.functions.find(f => 
       f.name === functionName || f.line === lineNumber
     )
     
     if (func) {
+      console.log('CodeLens: Found function to highlight:', func)
       this.highlightFunction(func)
       
       // Scroll to function
@@ -1577,6 +1631,8 @@ class CodeLensAnalyzer {
           break
         }
       }
+    } else {
+      console.warn('CodeLens: Function not found for highlighting:', functionName, 'Available functions:', this.complexityData.functions.map(f => f.name))
     }
   }
 
