@@ -2,7 +2,7 @@ import React from 'react'
 
 const Hero = () => {
   return (
-    <section className="gradient-bg py-20 px-4">
+    <section className="py-20 px-4" style={{backgroundColor: '#eff6fe'}}>
       <div className="max-w-6xl mx-auto text-center">
         <div className="mb-8">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
@@ -28,12 +28,12 @@ const Hero = () => {
               </svg>
               Add to Chrome
             </a>
-          <a href="/demo.html" target="_blank" rel="noopener noreferrer" className="btn-secondary text-lg px-8 py-4 inline-block">
+          {/* <a href="/demo.html" target="_blank" rel="noopener noreferrer" className="btn-secondary text-lg px-8 py-4 inline-block">
             <svg className="w-6 h-6 inline mr-2" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
             </svg>
             View Demo
-          </a>
+          </a> */}
         </div>
         
         

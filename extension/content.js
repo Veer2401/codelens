@@ -962,21 +962,32 @@ class CodeLensAnalyzer {
         averageComplexity: functions.length > 0 ? totalComplexity / functions.length : 0
       }
     } catch (error) {
-      console.warn('CodeLens: JavaScript parsing failed, using fallback.')
+      console.warn('CodeLens: JavaScript parsing failed, using fallback.', error)
       // Fallback: best-effort regex extraction so Functions tab still shows entries
-      const fallbackFunctions = this.extractFunctionsBestEffort(code, 'javascript')
-      const fallbackTotalComplexity = fallbackFunctions.reduce((sum, f) => sum + f.complexity, 0)
-      return {
-        functions: fallbackFunctions,
-        overallScore: fallbackTotalComplexity,
-        totalFunctions: fallbackFunctions.length,
-        averageComplexity: fallbackFunctions.length > 0 ? fallbackTotalComplexity / fallbackFunctions.length : 0
+      try {
+        const fallbackFunctions = this.extractFunctionsBestEffort(code, 'javascript') || []
+        const fallbackTotalComplexity = fallbackFunctions.reduce((sum, f) => sum + (f.complexity || 0), 0)
+        return {
+          functions: fallbackFunctions,
+          overallScore: fallbackTotalComplexity,
+          totalFunctions: fallbackFunctions.length,
+          averageComplexity: fallbackFunctions.length > 0 ? fallbackTotalComplexity / fallbackFunctions.length : 0
+        }
+      } catch (fallbackError) {
+        console.error('CodeLens: Fallback parsing also failed', fallbackError)
+        return {
+          functions: [],
+          overallScore: 0,
+          totalFunctions: 0,
+          averageComplexity: 0
+        }
       }
     }
   }
 
   extractFunctionsBestEffort(code, language) {
-    const results = []
+    try {
+      const results = []
     const computeJSHeuristicComplexity = (source, fromIndex) => {
       try {
         const slice = source.substring(fromIndex)
@@ -1016,7 +1027,6 @@ class CodeLensAnalyzer {
         add(/\bswitch\s*\(/g)
         add(/\bcase\b/g)
         add(/\bcatch\s*\(/g)
-        add(/\?/g) // ternary
         add(/&&/g)
         add(/\|\|/g)
         return complexity
@@ -1082,12 +1092,16 @@ class CodeLensAnalyzer {
       // ignore
     }
     // Deduplicate by name:line
-    const unique = new Map()
-    results.forEach(f => {
-      const key = `${f.name}:${f.line}`
-      if (!unique.has(key)) unique.set(key, f)
-    })
-    return Array.from(unique.values())
+      const unique = new Map()
+      results.forEach(f => {
+        const key = `${f.name}:${f.line}`
+        if (!unique.has(key)) unique.set(key, f)
+      })
+      return Array.from(unique.values())
+    } catch (error) {
+      console.error('CodeLens: extractFunctionsBestEffort failed', error)
+      return []
+    }
   }
 
   calculateCppComplexity(code) {
@@ -1509,54 +1523,49 @@ class CodeLensAnalyzer {
     let highlighted = false
     
     for (const block of codeBlocks) {
-      const text = block.textContent || block.innerText || ''
-      
-      // More precise function name matching
-      const functionName = func.name.trim()
-      if (this.findFunctionInText(text, functionName)) {
-        console.log('CodeLens: Found function in code block, highlighting...')
-        const container = this.findHighlightContainer(block)
-        
-        // Add complexity class
-        const complexityClass = this.getComplexityColorClass(func.complexity)
-        container.classList.add('complexity-highlight', complexityClass)
-        
-        // Add language-specific data attribute
-        container.setAttribute('data-language', this.complexityData.language || 'unknown')
-        
-        // Add tooltip
-        container.title = `${func.name}: ${func.complexity} complexity (${func.label})`
-        
-        this.highlightedElements.add(container)
-        highlighted = true
-        break
+      if (!block) continue;
+      const text = block.textContent || block.innerText || '';
+      const functionName = func.name ? func.name.trim() : '';
+      if (functionName && this.findFunctionInText(text, functionName)) {
+        console.log('CodeLens: Found function in code block, highlighting...');
+        const container = this.findHighlightContainer(block);
+        if (container && container.classList) {
+          const complexityClass = this.getComplexityColorClass(func.complexity);
+          container.classList.add('complexity-highlight', complexityClass);
+          container.setAttribute('data-language', this.complexityData.language || 'unknown');
+          container.title = `${func.name}: ${func.complexity} complexity (${func.label})`;
+          this.highlightedElements.add(container);
+          highlighted = true;
+          break;
+        } else {
+          console.warn('CodeLens: No valid container found for highlighting:', func.name);
+        }
       }
     }
-    
     if (!highlighted) {
-      console.warn('CodeLens: Could not find function in any code blocks:', func.name)
+      console.warn('CodeLens: Could not find function in any code blocks:', func.name);
     }
   }
   
   findFunctionInText(text, functionName) {
-    if (!text || !functionName) return false
-    
+    if (!text || !functionName) return false;
     // Create more precise regex patterns for different function types
     const patterns = [
       // Function declarations: function functionName(
-      new RegExp(`\\bfunction\\s+${this.escapeRegex(functionName)}\\s*\\(`, 'g'),
+      new RegExp(`\\bfunction\\s+${this.escapeRegex(functionName)}\\s*\\(`, 'i'),
       // Arrow functions: const functionName = ( or let functionName = (
-      new RegExp(`\\b(const|let|var)\\s+${this.escapeRegex(functionName)}\\s*=\\s*\\(`, 'g'),
+      new RegExp(`\\b(const|let|var)\\s+${this.escapeRegex(functionName)}\\s*=\\s*\\(`, 'i'),
       // Method definitions: functionName( or functionName: function
-      new RegExp(`\\b${this.escapeRegex(functionName)}\\s*\\(`, 'g'),
+      new RegExp(`\\b${this.escapeRegex(functionName)}\\s*\\(`, 'i'),
       // Class methods: functionName( or functionName: function
-      new RegExp(`\\b${this.escapeRegex(functionName)}\\s*[:=]\\s*function`, 'g'),
+      new RegExp(`\\b${this.escapeRegex(functionName)}\\s*[:=]\\s*function`, 'i'),
       // Arrow function assignments: functionName = (params) =>
-      new RegExp(`\\b${this.escapeRegex(functionName)}\\s*=\\s*\\([^)]*\\)\\s*=>`, 'g')
-    ]
-    
+      new RegExp(`\\b${this.escapeRegex(functionName)}\\s*=\\s*\\([^)]*\\)\\s*=>`, 'i'),
+      // Direct name match (fallback)
+      new RegExp(`\\b${this.escapeRegex(functionName)}\\b`, 'i')
+    ];
     // Check if any pattern matches
-    return patterns.some(pattern => pattern.test(text))
+    return patterns.some(pattern => pattern.test(text));
   }
   
   escapeRegex(string) {
