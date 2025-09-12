@@ -11,7 +11,11 @@ const ComplexityChart = ({ functions }) => {
     )
   }
 
-  // Group functions by complexity ranges
+  // Calculate average complexity and complexity distribution
+  const averageComplexity = functions.length > 0 
+    ? functions.reduce((sum, f) => sum + f.complexity, 0) / functions.length 
+    : 0
+  
   const complexityRanges = {
     '1-5': functions.filter(f => f.complexity <= 5).length,
     '6-10': functions.filter(f => f.complexity > 5 && f.complexity <= 10).length,
@@ -22,27 +26,43 @@ const ComplexityChart = ({ functions }) => {
   const maxCount = Math.max(...Object.values(complexityRanges))
   const colors = {
     '1-5': 'bg-complexity-low',
-    '6-10': 'bg-complexity-low',
-    '11-15': 'bg-complexity-low',
-    '16-20': 'bg-complexity-high',
-    '21-25': 'bg-complexity-high',
-    '26-30': 'bg-complexity-extreme'
-
+    '6-10': 'bg-complexity-medium',
+    '11-15': 'bg-complexity-high',
+    '16+': 'bg-complexity-extreme'
   }
 
   // Bubble chart data
   const bubbleData = functions.slice(0, 20).map((func, index) => ({
     ...func,
     size: Math.max(20, Math.min(60, func.complexity * 3)),
-    color: func.complexity <= 10 ? 'bg-complexity-low' :
+    color: func.complexity <= 5 ? 'bg-complexity-low' :
+           func.complexity <= 10 ? 'bg-complexity-medium' :
            func.complexity <= 15 ? 'bg-complexity-high' : 'bg-complexity-extreme'
   }))
 
   return (
     <div className="space-y-6">
+      {/* Average Complexity Display */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-1">Average Code Complexity</h3>
+            <p className="text-sm text-gray-600">Based on cyclomatic complexity analysis</p>
+          </div>
+          <div className="text-right">
+            <div className={`text-3xl font-bold ${averageComplexity <= 5 ? 'text-green-600' : averageComplexity <= 10 ? 'text-yellow-600' : averageComplexity <= 15 ? 'text-orange-600' : 'text-red-600'}`}>
+              {averageComplexity.toFixed(1)}
+            </div>
+            <div className="text-sm text-gray-600">
+              {averageComplexity <= 5 ? 'Low Risk' : averageComplexity <= 10 ? 'Medium Risk' : averageComplexity <= 15 ? 'High Risk' : 'Extreme Risk'}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Bar Chart */}
       <div>
-        <h3 className="font-semibold text-gray-900 mb-4">Complexity Distribution</h3>
+        <h3 className="font-semibold text-gray-900 mb-4">Function Complexity Distribution</h3>
         <div className="space-y-3">
           {Object.entries(complexityRanges).map(([range, count]) => (
             <div key={range} className="flex items-center space-x-3">
@@ -61,7 +81,8 @@ const ComplexityChart = ({ functions }) => {
 
       {/* Bubble Chart */}
       <div>
-        <h3 className="font-semibold text-gray-900 mb-4">Function Complexity Bubble Chart</h3>
+        <h3 className="font-semibold text-gray-900 mb-4">Individual Function Complexity (Top 20)</h3>
+        <p className="text-sm text-gray-600 mb-4">Each bubble represents a function's cyclomatic complexity score</p>
         <div className="bg-gray-50 rounded-lg p-4 h-48 relative overflow-hidden">
           {bubbleData.map((func, index) => (
             <div
@@ -87,7 +108,7 @@ const ComplexityChart = ({ functions }) => {
               <span className="text-gray-600">Low</span>
             </div>
             <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-complexity-low rounded-full"></div>
+              <div className="w-3 h-3 bg-complexity-medium rounded-full"></div>
               <span className="text-gray-600">Medium</span>
             </div>
             <div className="flex items-center space-x-1">
@@ -103,21 +124,45 @@ const ComplexityChart = ({ functions }) => {
       </div>
 
       {/* Statistics */}
-      <div className="grid grid-cols-1 gap-4">
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <h4 className="font-semibold text-green-900 mb-2">Best Practices</h4>
-          <div className="space-y-1 text-sm text-green-800">
-            {functions
-              .filter(f => f.complexity <= 5)
-              .slice(0, 3)
-              .map((func, index) => (
-                <div key={index} className="flex justify-between">
-                  <span className="truncate">{func.name || `Function ${index + 1}`}</span>
-                  <span className="font-medium">{func.complexity}</span>
-                </div>
-              ))}
-            {functions.filter(f => f.complexity <= 5).length === 0 && (
-              <span className="text-green-600">No low complexity functions found</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Complexity Analysis */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h4 className="font-semibold text-blue-900 mb-2">Code Quality Analysis</h4>
+          <div className="space-y-2 text-sm text-blue-800">
+            <div className="flex justify-between">
+              <span>Average Complexity:</span>
+              <span className="font-medium">{averageComplexity.toFixed(1)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Total Functions:</span>
+              <span className="font-medium">{functions.length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Low Risk Functions:</span>
+              <span className="font-medium">{functions.filter(f => f.complexity <= 5).length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>High Risk Functions:</span>
+              <span className="font-medium">{functions.filter(f => f.complexity > 15).length}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Recommendations */}
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <h4 className="font-semibold text-amber-900 mb-2">Recommendations</h4>
+          <div className="space-y-1 text-sm text-amber-800">
+            {averageComplexity <= 5 && (
+              <div>✅ Excellent code quality! Keep up the good work.</div>
+            )}
+            {averageComplexity > 5 && averageComplexity <= 10 && (
+              <div>⚠️ Consider refactoring some functions to reduce complexity.</div>
+            )}
+            {averageComplexity > 10 && (
+              <div>🚨 High complexity detected. Prioritize refactoring high-risk functions.</div>
+            )}
+            {functions.filter(f => f.complexity > 15).length > 0 && (
+              <div>🔴 {functions.filter(f => f.complexity > 15).length} extreme complexity function(s) need immediate attention.</div>
             )}
           </div>
         </div>

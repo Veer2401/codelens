@@ -193,10 +193,6 @@ class CodeLensAnalyzer {
         <button class="widget-close" id="codelens-close">×</button>
       </div>
       <div class="widget-content">
-        <div class="complexity-score">
-          <div class="score-label">Complexity</div>
-          <div class="score-number" id="codelens-score">-</div>
-        </div>
         <div class="function-count">
           <div class="count-label">Functions</div>
           <div class="count-number" id="codelens-count">-</div>
@@ -270,17 +266,7 @@ class CodeLensAnalyzer {
   updateFloatingWidget() {
     if (!this.floatingWidget) return
     
-    const scoreElement = this.floatingWidget.querySelector('#codelens-score')
     const countElement = this.floatingWidget.querySelector('#codelens-count')
-    
-    if (scoreElement) {
-      // Round the overall score to 2 decimal places
-      const roundedScore = typeof this.complexityData.overallScore === 'number' 
-        ? this.complexityData.overallScore.toFixed(2) 
-        : this.complexityData.overallScore
-      scoreElement.textContent = roundedScore
-      scoreElement.className = `score-number ${this.getComplexityColorClass(this.complexityData.overallScore)}`
-    }
     
     if (countElement) {
       countElement.textContent = this.complexityData.totalFunctions
@@ -820,7 +806,8 @@ class CodeLensAnalyzer {
         // If the source looks like JSX or TypeScript, avoid Esprima and fallback
         if (this.isProbablyJSX(code) || this.isProbablyTypeScript(code)) {
           const fns = this.extractFunctionsBestEffort(code, 'javascript')
-          return { functions: fns, overallScore: 0, totalFunctions: fns.length, averageComplexity: 0 }
+          const totalComplexity = fns.reduce((sum, f) => sum + f.complexity, 0)
+          return { functions: fns, overallScore: totalComplexity, totalFunctions: fns.length, averageComplexity: fns.length > 0 ? totalComplexity / fns.length : 0 }
         }
         return this.calculateJavaScriptComplexity(code)
       case 'jsx':
@@ -828,7 +815,8 @@ class CodeLensAnalyzer {
       case 'tsx':
         // Use best-effort parsing for JSX/TS/TSX to avoid Esprima parse errors
         const fns = this.extractFunctionsBestEffort(code, 'javascript')
-        return { functions: fns, overallScore: 0, totalFunctions: fns.length, averageComplexity: 0 }
+        const totalComplexity = fns.reduce((sum, f) => sum + f.complexity, 0)
+        return { functions: fns, overallScore: totalComplexity, totalFunctions: fns.length, averageComplexity: fns.length > 0 ? totalComplexity / fns.length : 0 }
       case 'cpp':
       case 'c':
         return this.calculateCppComplexity(code)
@@ -872,11 +860,12 @@ class CodeLensAnalyzer {
     // Guard: if this looks like JSX or TypeScript, avoid Esprima and fallback
     if (this.isProbablyJSX(code) || this.isProbablyTypeScript(code)) {
       const fns = this.extractFunctionsBestEffort(code, 'javascript')
-      return { functions: fns, overallScore: 0, totalFunctions: fns.length, averageComplexity: 0 }
+      const totalComplexity = fns.reduce((sum, f) => sum + f.complexity, 0)
+      return { functions: fns, overallScore: totalComplexity, totalFunctions: fns.length, averageComplexity: fns.length > 0 ? totalComplexity / fns.length : 0 }
     }
     if (!this.esprimaLoaded) {
       console.log('CodeLens: Esprima not loaded yet, waiting...')
-      return { functions: [], overallScore: 0 }
+      return { functions: [], overallScore: 0, totalFunctions: 0, averageComplexity: 0 }
     }
 
     try {
@@ -976,11 +965,12 @@ class CodeLensAnalyzer {
       console.warn('CodeLens: JavaScript parsing failed, using fallback.')
       // Fallback: best-effort regex extraction so Functions tab still shows entries
       const fallbackFunctions = this.extractFunctionsBestEffort(code, 'javascript')
+      const fallbackTotalComplexity = fallbackFunctions.reduce((sum, f) => sum + f.complexity, 0)
       return {
         functions: fallbackFunctions,
-        overallScore: 0,
+        overallScore: fallbackTotalComplexity,
         totalFunctions: fallbackFunctions.length,
-        averageComplexity: 0
+        averageComplexity: fallbackFunctions.length > 0 ? fallbackTotalComplexity / fallbackFunctions.length : 0
       }
     }
   }

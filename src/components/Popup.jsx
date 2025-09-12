@@ -156,6 +156,16 @@ const Popup = () => {
     return 'Poor'
   }
 
+  const getAverageComplexity = () => {
+    if (complexityData.averageComplexity) {
+      return complexityData.averageComplexity
+    }
+    if (complexityData.functions.length > 0) {
+      return complexityData.functions.reduce((sum, f) => sum + f.complexity, 0) / complexityData.functions.length
+    }
+    return 0
+  }
+
   const handleRefresh = () => {
     checkCurrentTab()
   }
@@ -287,9 +297,9 @@ const Popup = () => {
         {currentTab === 'overview' && (
           <div className="space-y-4">
             <ComplexityScore
-              score={complexityData.overallScore}
-              label={getScoreLabel(complexityData.overallScore)}
-              colorClass={getScoreColor(complexityData.overallScore)}
+              score={getAverageComplexity()}
+              label={getScoreLabel(getAverageComplexity())}
+              colorClass={getScoreColor(getAverageComplexity())}
             />
             
             <div className="grid grid-cols-2 gap-4">
@@ -300,8 +310,8 @@ const Popup = () => {
                 <div className="text-sm text-gray-600">Total Functions</div>
               </div>
               <div className="bg-gray-50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-gray-900 truncate" title={complexityData.averageComplexity.toFixed(2)}>
-                  {complexityData.averageComplexity.toFixed(2)}
+                <div className="text-2xl font-bold text-gray-900 truncate" title={getAverageComplexity().toFixed(2)}>
+                  {getAverageComplexity().toFixed(2)}
                 </div>
                 <div className="text-sm text-gray-600">Avg Complexity</div>
               </div>
@@ -315,6 +325,16 @@ const Popup = () => {
                 <li>• Use early returns to reduce nesting</li>
               </ul>
             </div>
+
+            {/* Analyze Code Button */}
+            <button 
+              onClick={handleAnalyzeClick}
+              disabled={isAnalyzing || !isSupportedPlatform}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-2 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span>🔍</span>
+              <span>{isAnalyzing ? 'Analyzing...' : 'Analyze Code'}</span>
+            </button>
           </div>
         )}
 

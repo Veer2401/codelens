@@ -29,13 +29,8 @@ fi
 echo "📁 Copying built files to extension directory..."
 cp -r dist/* extension/
 
-# Copy extension-specific files
-echo "📋 Copying extension files..."
-cp extension/manifest.json extension/
-cp extension/content.js extension/
-cp extension/content.css extension/
-cp extension/background.js extension/
-cp extension/popup.html extension/
+# Extension-specific files are already in extension/ directory
+echo "📋 Extension files are ready..."
 
 # Create icons directory if it doesn't exist
 if [ ! -d "extension/icons" ]; then
