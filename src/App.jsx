@@ -13,8 +13,8 @@ function App() {
         <Route path="/" element={
           <div className="min-h-screen bg-blue-50">
             <Hero />
-            <Features />
             <HowItWorks />
+            <Features />
             <Footer />
           </div>
         } />

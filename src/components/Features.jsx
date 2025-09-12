@@ -59,11 +59,11 @@ const Features = () => {
   ]
 
   return (
-    <section className="py-20 px-4" style={{backgroundColor: '#f7fbff'}}>
+    <section className="py-20 px-4 gradient-bg">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Powerful Features for Better Code
+            Features for Better Code
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Our Chrome extension provides everything you need to understand and improve your code's complexity.
@@ -83,7 +83,9 @@ const Features = () => {
                 {feature.description}
               </p>
             </div>
+            
           ))}
+          
         </div>
       </div>
     </section>

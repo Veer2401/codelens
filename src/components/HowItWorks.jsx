@@ -45,7 +45,7 @@ const HowItWorks = () => {
   ]
 
   return (
-    <section className="py-20 px-4 gradient-bg">
+    <section className="py-20 px-4" style={{backgroundColor: '#fff'}}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">

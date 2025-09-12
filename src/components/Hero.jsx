@@ -5,6 +5,15 @@ const Hero = () => {
     <section className="py-20 px-4" style={{backgroundColor: '#eff6fe'}}>
       <div className="max-w-6xl mx-auto text-center">
         <div className="mb-8">
+          <div className="mx-auto mb-6 flex items-center justify-center">
+            <div className="bg-white rounded-full w-32 h-32 flex items-center justify-center shadow">
+              <img
+                src="codelens-logo.jpg"
+                alt="CodeLens Logo"
+                className="w-24 h-24 object-contain"
+              />
+            </div>
+          </div>
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
              Code<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
             Lens
