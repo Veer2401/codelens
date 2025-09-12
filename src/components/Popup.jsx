@@ -202,7 +202,7 @@ const Popup = () => {
       case 'java':
         return 'bg-red-100 text-red-800'
       case 'csharp':
-        return 'bg-purple-100 text-purple-800'
+        return 'bg-sky-100 text-sky-800'
       case 'go':
         return 'bg-teal-100 text-teal-800'
       case 'rust':
@@ -217,11 +217,11 @@ const Popup = () => {
   return (
     <div className="w-96 h-[600px] bg-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
+      <div className="bg-gradient-to-r from-sky-600 to-sky-500 text-white p-4">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-bold">CodeLens</h1>
         </div>
-        <p className="text-blue-100 text-sm mt-1">
+        <p className="text-sky-100 text-sm mt-1">
           Real-time complexity analysis
         </p>
       </div>
@@ -282,7 +282,7 @@ const Popup = () => {
             onClick={() => setCurrentTab(tab.id)}
             className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
               currentTab === tab.id
-                ? 'text-blue-600 border-b-2 border-blue-600'
+                ? 'text-sky-600 border-b-2 border-sky-600'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -317,9 +317,9 @@ const Popup = () => {
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-semibold text-blue-900 mb-2">Quick Tips</h3>
-              <ul className="text-sm text-blue-800 space-y-1">
+            <div className="bg-sky-50 border border-sky-200 rounded-lg p-4">
+              <h3 className="font-semibold text-sky-900 mb-2">Quick Tips</h3>
+              <ul className="text-sm text-sky-800 space-y-1">
                 <li>• Keep functions under 10 complexity</li>
                 <li>• Break down complex functions</li>
                 <li>• Use early returns to reduce nesting</li>
@@ -330,7 +330,7 @@ const Popup = () => {
             <button 
               onClick={handleAnalyzeClick}
               disabled={isAnalyzing || !isSupportedPlatform}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-2 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-sky-600 to-sky-500 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-2 hover:from-sky-700 hover:to-sky-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span>🔍</span>
               <span>{isAnalyzing ? 'Analyzing...' : 'Analyze Code'}</span>

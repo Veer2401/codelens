@@ -201,7 +201,7 @@ class CodeLensAnalyzer {
       </div>
     `
     
-    document.body.appendChild(widget)-vi
+    document.body.appendChild(widget)
     this.floatingWidget = widget
     
     // Add event listeners

@@ -8,7 +8,7 @@ const HowItWorks = () => {
       description: "Add CodeLens to Chrome from the Web Store with one click.",
       icon: (
         <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M19 13H5v-2h14v2z"/>
+          <path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7 1.49 0 2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"/>
         </svg>
       )
     },
@@ -18,7 +18,7 @@ const HowItWorks = () => {
       description: "Visit any supported platform like GitHub, CodeSandbox, or StackBlitz.",
       icon: (
         <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
         </svg>
       )
     },
@@ -59,12 +59,9 @@ const HowItWorks = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((step, index) => (
             <div key={index} className="text-center group">
-              <div className="relative mb-6">
-                <div className="w-24 h-24 mx-auto bg-white rounded-full shadow-lg flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform duration-300">
+              <div className="mb-6">
+                <div className="w-24 h-24 mx-auto bg-white rounded-full shadow-lg flex items-center justify-center text-sky-600 group-hover:scale-110 transition-transform duration-300">
                   {step.icon}
-                </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                  {step.number}
                 </div>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
@@ -78,7 +75,7 @@ const HowItWorks = () => {
         </div>
         
         <div className="text-center mt-16">
-          <div className="inline-flex items-center space-x-2 text-blue-600 font-semibold">
+          <div className="inline-flex items-center space-x-2 text-sky-600 font-semibold text-lg">
             <span>Ready to get started?</span>
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>

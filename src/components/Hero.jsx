@@ -20,8 +20,7 @@ const Hero = () => {
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Analyze code complexity in real-time inside web-based editors. 
-            Get instant insights into your code's maintainability with beautiful visualizations.
+          Code quality, visualized.
           </p>
         </div>
         

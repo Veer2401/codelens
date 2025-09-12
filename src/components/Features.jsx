@@ -35,8 +35,8 @@ const Features = () => {
           <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
         </svg>
       ),
-      title: "Beautiful Charts",
-      description: "Interactive bubble charts and graphs show complexity distribution and trends."
+      title: "Interactive Charts",
+      description: " Bubble charts and graphs show complexity distribution and trends."
     },
     {
       icon: (
@@ -73,7 +73,7 @@ const Features = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <div key={index} className="card">
-              <div className="text-blue-600 mb-4">
+              <div className="text-sky-600 mb-4">
                 {feature.icon}
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">

@@ -75,7 +75,7 @@ const PrivacyPolicy = () => {
                 Permissions
               </h2>
               <div className="space-y-4 text-gray-600">
-                <p>The extension may request access to the pages you view (e.g., GitHub or code hosting sites) in order to analyze the code you select.</p>
+                <p>The extension may request access to the pages you view (e.g., GitHub, CodeSandbox, or StackBlitz.) in order to analyze the code you select.</p>
                 <p>These permissions are used only to read the visible code for complexity scoring.</p>
               </div>
             </div>

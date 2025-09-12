@@ -27,7 +27,7 @@
 }
 
 .widget-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #bae6fd;
   padding: 14px 18px;
   border-radius: 12px 12px 0 0;
   display: flex;
@@ -40,13 +40,13 @@
 .widget-title {
   font-weight: 600;
   font-size: 16px;
-  color: white;
+  color: #0f172a;
 }
 
 .widget-close {
   background: none;
   border: none;
-  color: white;
+  color: #0f172a;
   font-size: 18px;
   cursor: pointer;
   padding: 0;
@@ -61,7 +61,7 @@
 }
 
 .widget-close:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(15, 23, 42, 0.1);
 }
 
 .widget-content {
@@ -107,8 +107,8 @@
 .analyze-btn {
   width: 100%;
   padding: 12px 18px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #bae6fd;
+  color: #0f172a;
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -123,7 +123,7 @@
 
 .analyze-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(186, 230, 253, 0.4);
 }
 
 .analyze-btn:active {
@@ -347,8 +347,8 @@
   position: fixed;
   width: 56px;
   height: 56px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #bae6fd;
+  color: #0f172a;
   border-radius: 50%;
   display: flex;
   align-items: center;
