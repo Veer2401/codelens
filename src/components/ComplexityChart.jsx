@@ -32,11 +32,24 @@ const ComplexityChart = ({ functions }) => {
   }
 
   // Bubble chart data
-  const bubbleData = functions.slice(0, 20).map((func, index) => ({
-    ...func,
-    size: Math.max(20, Math.min(60, func.complexity * 3)),
-    color: 'bg-gradient-to-br from-blue-500 to-blue-700'
-  }))
+  const bubbleData = functions.slice(0, 20).map((func, index) => {
+    let color = ''
+    if (func.complexity <= 5) {
+      color = 'bg-green-500' // Low - Green
+    } else if (func.complexity <= 10) {
+      color = 'bg-orange-500' // Medium - Orange
+    } else if (func.complexity <= 15) {
+      color = 'bg-red-500' // High - Red
+    } else {
+      color = 'bg-red-800' // Extreme - Maroon
+    }
+    
+    return {
+      ...func,
+      size: Math.max(20, Math.min(60, func.complexity * 3)),
+      color: color
+    }
+  })
 
   return (
     <div className="space-y-6">
