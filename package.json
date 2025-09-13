@@ -1,6 +1,6 @@
 {
   "name": "live-complexity-visualiser",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "CodeLens - Real-time code complexity analysis with beautiful visualizations for web-based editors",
   "main": "index.js",
