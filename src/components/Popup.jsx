@@ -170,47 +170,6 @@ const Popup = () => {
     checkCurrentTab()
   }
 
-  const getLanguageDisplayName = (language) => {
-    switch (language) {
-      case 'javascript':
-        return 'JavaScript'
-      case 'typescript':
-        return 'TypeScript'
-      case 'python':
-        return 'Python'
-      case 'java':
-        return 'Java'
-      case 'csharp':
-        return 'C#'
-      case 'go':
-        return 'Go'
-      case 'rust':
-        return 'Rust'
-      default:
-        return language
-    }
-  }
-
-  const getLanguageColorClass = (language) => {
-    switch (language) {
-      case 'javascript':
-        return 'bg-blue-100 text-blue-800'
-      case 'typescript':
-        return 'bg-green-100 text-green-800'
-      case 'python':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'java':
-        return 'bg-red-100 text-red-800'
-      case 'csharp':
-        return 'bg-sky-100 text-sky-800'
-      case 'go':
-        return 'bg-teal-100 text-teal-800'
-      case 'rust':
-        return 'bg-orange-100 text-orange-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
-  }
 
   
 
@@ -258,14 +217,6 @@ const Popup = () => {
               {isSupportedPlatform && <span className="text-green-600 ml-2">✓ Supported</span>}
               {!isSupportedPlatform && <span className="text-red-600 ml-2">✗ Not supported</span>}
             </div>
-            {complexityData.language !== 'unknown' && (
-              <div className="flex items-center space-x-2">
-                <span className="text-gray-500">Language:</span>
-                <span className={`px-2 py-1 rounded text-xs font-medium ${getLanguageColorClass(complexityData.language)}`}>
-                  {getLanguageDisplayName(complexityData.language)}
-                </span>
-              </div>
-            )}
           </div>
         </div>
       )}

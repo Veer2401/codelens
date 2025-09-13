@@ -10,7 +10,7 @@ const Hero = () => {
               <span className="absolute w-36 h-36 rounded-full bg-sky-500 opacity-60 animate-fadePulse"></span>
               <div className="bg-white rounded-full w-32 h-32 flex items-center justify-center shadow relative z-10">
                 <img
-                  src="codelens-logo.jpg"
+                  src="code.jpg"
                   alt="CodeLens Logo"
                   className="w-24 h-24 object-contain"
                 />

@@ -1530,55 +1530,69 @@ class CodeLensAnalyzer {
   }
 
   highlightFunction(func) {
-    console.log('CodeLens: Highlighting function:', func.name, 'with complexity:', func.complexity)
-    
-    const codeBlocks = this.findCodeBlocks()
-    let highlighted = false
-    
-    for (const block of codeBlocks) {
-      if (!block) continue;
-      const text = block.textContent || block.innerText || '';
-      const functionName = func.name ? func.name.trim() : '';
-      if (functionName && this.findFunctionInText(text, functionName)) {
-        console.log('CodeLens: Found function in code block, highlighting...');
-        const container = this.findHighlightContainer(block);
-        if (container && container.classList) {
-          const complexityClass = this.getComplexityColorClass(func.complexity);
-          container.classList.add('complexity-highlight', complexityClass);
-          container.setAttribute('data-language', this.complexityData.language || 'unknown');
-          container.title = `${func.name}: ${func.complexity} complexity (${func.label})`;
-          this.highlightedElements.add(container);
-          highlighted = true;
-          break;
-        } else {
-          console.warn('CodeLens: No valid container found for highlighting:', func.name);
+    try {
+      console.log('CodeLens: Highlighting function:', func.name, 'with complexity:', func.complexity)
+      
+      if (!func || !func.name) {
+        console.warn('CodeLens: Invalid function object provided to highlightFunction');
+        return;
+      }
+      
+      const codeBlocks = this.findCodeBlocks()
+      let highlighted = false
+      
+      for (const block of codeBlocks) {
+        if (!block) continue;
+        const text = block.textContent || block.innerText || '';
+        const functionName = func.name ? func.name.trim() : '';
+        if (functionName && this.findFunctionInText(text, functionName)) {
+          console.log('CodeLens: Found function in code block, highlighting...');
+          const container = this.findHighlightContainer(block);
+          if (container && container.classList) {
+            const complexityClass = this.getComplexityColorClass(func.complexity);
+            container.classList.add('complexity-highlight', complexityClass);
+            container.setAttribute('data-language', this.complexityData.language || 'unknown');
+            container.title = `${func.name}: ${func.complexity} complexity (${func.label})`;
+            this.highlightedElements.add(container);
+            highlighted = true;
+            break;
+          } else {
+            console.warn('CodeLens: No valid container found for highlighting:', func.name);
+          }
         }
       }
-    }
-    if (!highlighted) {
-      console.warn('CodeLens: Could not find function in any code blocks:', func.name);
+      if (!highlighted) {
+        console.warn('CodeLens: Could not find function in any code blocks:', func.name);
+      }
+    } catch (error) {
+      console.error('CodeLens: Error in highlightFunction:', error);
     }
   }
   
   findFunctionInText(text, functionName) {
-    if (!text || !functionName) return false;
-    // Create more precise regex patterns for different function types
-    const patterns = [
-      // Function declarations: function functionName(
-      new RegExp(`\\bfunction\\s+${this.escapeRegex(functionName)}\\s*\\(`, 'i'),
-      // Arrow functions: const functionName = ( or let functionName = (
-      new RegExp(`\\b(const|let|var)\\s+${this.escapeRegex(functionName)}\\s*=\\s*\\(`, 'i'),
-      // Method definitions: functionName( or functionName: function
-      new RegExp(`\\b${this.escapeRegex(functionName)}\\s*\\(`, 'i'),
-      // Class methods: functionName( or functionName: function
-      new RegExp(`\\b${this.escapeRegex(functionName)}\\s*[:=]\\s*function`, 'i'),
-      // Arrow function assignments: functionName = (params) =>
-      new RegExp(`\\b${this.escapeRegex(functionName)}\\s*=\\s*\\([^)]*\\)\\s*=>`, 'i'),
-      // Direct name match (fallback)
-      new RegExp(`\\b${this.escapeRegex(functionName)}\\b`, 'i')
-    ];
-    // Check if any pattern matches
-    return patterns.some(pattern => pattern.test(text));
+    try {
+      if (!text || !functionName) return false;
+      // Create more precise regex patterns for different function types
+      const patterns = [
+        // Function declarations: function functionName(
+        new RegExp(`\\bfunction\\s+${this.escapeRegex(functionName)}\\s*\\(`, 'i'),
+        // Arrow functions: const functionName = ( or let functionName = (
+        new RegExp(`\\b(const|let|var)\\s+${this.escapeRegex(functionName)}\\s*=\\s*\\(`, 'i'),
+        // Method definitions: functionName( or functionName: function
+        new RegExp(`\\b${this.escapeRegex(functionName)}\\s*\\(`, 'i'),
+        // Class methods: functionName( or functionName: function
+        new RegExp(`\\b${this.escapeRegex(functionName)}\\s*[:=]\\s*function`, 'i'),
+        // Arrow function assignments: functionName = (params) =>
+        new RegExp(`\\b${this.escapeRegex(functionName)}\\s*=\\s*\\([^)]*\\)\\s*=>`, 'i'),
+        // Direct name match (fallback)
+        new RegExp(`\\b${this.escapeRegex(functionName)}\\b`, 'i')
+      ];
+      // Check if any pattern matches
+      return patterns.some(pattern => pattern.test(text));
+    } catch (error) {
+      console.error('CodeLens: Error in findFunctionInText:', error);
+      return false;
+    }
   }
   
   escapeRegex(string) {
@@ -1830,10 +1844,16 @@ class CodeLensAnalyzer {
 // Initialize the analyzer
 let analyzer
 
+// Add version identifier for debugging
+console.log('CodeLens: Content script loaded - Version 1.0.1');
+window.codelensVersion = '1.0.1';
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
+    console.log('CodeLens: DOM loaded, initializing analyzer');
     analyzer = new CodeLensAnalyzer()
   })
 } else {
+  console.log('CodeLens: DOM already loaded, initializing analyzer immediately');
   analyzer = new CodeLensAnalyzer()
 }
