@@ -6,12 +6,15 @@ const Hero = () => {
       <div className="max-w-6xl mx-auto text-center">
         <div className="mb-8">
           <div className="mx-auto mb-6 flex items-center justify-center">
-            <div className="bg-white rounded-full w-32 h-32 flex items-center justify-center shadow">
-              <img
-                src="codelens-logo.jpg"
-                alt="CodeLens Logo"
-                className="w-24 h-24 object-contain"
-              />
+            <div className="relative flex items-center justify-center w-32 h-32">
+              <span className="absolute w-36 h-36 rounded-full bg-sky-500 opacity-60 animate-fadePulse"></span>
+              <div className="bg-white rounded-full w-32 h-32 flex items-center justify-center shadow relative z-10">
+                <img
+                  src="codelens-logo.jpg"
+                  alt="CodeLens Logo"
+                  className="w-24 h-24 object-contain"
+                />
+              </div>
             </div>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-sky-600 mb-6">
@@ -20,11 +23,13 @@ const Hero = () => {
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-          Code quality, visualized.
+          Your Code quality, Visualized.
+            {/* Code quality, visualized. */}
+
           </p>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <a
               href="https://chromewebstore.google.com/category/extensions"
               target="_blank"
