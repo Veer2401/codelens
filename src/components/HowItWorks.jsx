@@ -25,7 +25,7 @@ const HowItWorks = () => {
     {
       number: "03",
       title: "Automatic Analysis",
-      description: "The extension automatically detects code blocks and analyzes complexity in real-time.",
+      description: "Open the extension and it automatically detects code blocks and analyzes complexity in real-time.",
       icon: (
         <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
