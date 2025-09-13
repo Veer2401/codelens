@@ -179,6 +179,16 @@ class CodeLensAnalyzer {
 
     // Listen for text selection changes for selection-based analysis
     document.addEventListener('selectionchange', () => this.handleSelectionChange())
+    
+    // Listen for window resize to ensure widget stays visible
+    window.addEventListener('resize', () => {
+      if (this.floatingWidget) {
+        this.ensureWidgetVisibility()
+      }
+      if (this.showWidgetButton) {
+        this.positionShowButtonResponsively(this.showWidgetButton)
+      }
+    })
   }
 
   createFloatingWidget() {
@@ -203,6 +213,9 @@ class CodeLensAnalyzer {
     
     document.body.appendChild(widget)
     this.floatingWidget = widget
+    
+    // Ensure widget is positioned correctly on all screen sizes
+    this.ensureWidgetVisibility()
     
     // Add event listeners
     const analyzeBtn = widget.querySelector('#codelens-analyze')
@@ -1669,15 +1682,14 @@ class CodeLensAnalyzer {
     showBtn.innerHTML = '🔍'
     showBtn.title = 'Show CodeLens Widget'
     
-    // Positioning: use saved position if available, else default top-right
+    // Positioning: use saved position if available, else default top-right with responsive positioning
     if (this.showWidgetPos && typeof this.showWidgetPos.top === 'number' && typeof this.showWidgetPos.left === 'number') {
       showBtn.style.top = this.showWidgetPos.top + 'px'
       showBtn.style.left = this.showWidgetPos.left + 'px'
       showBtn.style.right = ''
     } else {
-      showBtn.style.top = '80px'
-      showBtn.style.right = '20px'
-      showBtn.style.left = ''
+      // Responsive positioning for show button
+      this.positionShowButtonResponsively(showBtn)
     }
     
     showBtn.addEventListener('click', () => {
@@ -1741,6 +1753,77 @@ class CodeLensAnalyzer {
       this.showWidgetButton.remove()
       this.showWidgetButton = null
     }
+  }
+
+  ensureWidgetVisibility() {
+    if (!this.floatingWidget) return
+    
+    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight
+    
+    // Force responsive positioning based on screen size
+    if (viewportWidth <= 480) {
+      // Mobile: Full width with proper margins
+      this.floatingWidget.style.width = 'calc(100vw - 20px)'
+      this.floatingWidget.style.maxWidth = 'calc(100vw - 20px)'
+      this.floatingWidget.style.right = '10px'
+      this.floatingWidget.style.top = '10px'
+      this.floatingWidget.style.left = '10px'
+      this.floatingWidget.style.position = 'fixed'
+      this.floatingWidget.style.zIndex = '10000'
+    } else if (viewportWidth <= 768) {
+      // Tablet: Medium width
+      this.floatingWidget.style.width = '240px'
+      this.floatingWidget.style.right = '15px'
+      this.floatingWidget.style.top = '15px'
+      this.floatingWidget.style.left = 'auto'
+    } else {
+      // Desktop: Full width
+      this.floatingWidget.style.width = '260px'
+      this.floatingWidget.style.right = '20px'
+      this.floatingWidget.style.top = '20px'
+      this.floatingWidget.style.left = 'auto'
+    }
+    
+    // Ensure widget doesn't go below viewport
+    const widgetRect = this.floatingWidget.getBoundingClientRect()
+    if (widgetRect.bottom > viewportHeight - 10) {
+      this.floatingWidget.style.top = Math.max(10, viewportHeight - widgetRect.height - 10) + 'px'
+    }
+  }
+
+  positionShowButtonResponsively(showBtn) {
+    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight
+    
+    if (viewportWidth <= 480) {
+      // Mobile: Position at top-right with smaller size
+      showBtn.style.top = '10px'
+      showBtn.style.right = '10px'
+      showBtn.style.left = 'auto'
+      showBtn.style.width = '48px'
+      showBtn.style.height = '48px'
+      showBtn.style.fontSize = '20px'
+    } else if (viewportWidth <= 768) {
+      // Tablet: Medium size
+      showBtn.style.top = '15px'
+      showBtn.style.right = '15px'
+      showBtn.style.left = 'auto'
+      showBtn.style.width = '52px'
+      showBtn.style.height = '52px'
+      showBtn.style.fontSize = '22px'
+    } else {
+      // Desktop: Full size
+      showBtn.style.top = '20px'
+      showBtn.style.right = '20px'
+      showBtn.style.left = 'auto'
+      showBtn.style.width = '56px'
+      showBtn.style.height = '56px'
+      showBtn.style.fontSize = '24px'
+    }
+    
+    showBtn.style.position = 'fixed'
+    showBtn.style.zIndex = '10000'
   }
 }
 
