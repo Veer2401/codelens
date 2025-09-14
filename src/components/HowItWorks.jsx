@@ -75,12 +75,17 @@ const HowItWorks = () => {
         </div>
         
         <div className="text-center mt-16">
-          <div className="inline-flex items-center space-x-2 text-sky-600 font-semibold text-lg">
+          <a 
+            href="https://chromewebstore.google.com/category/extensions" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center space-x-2 text-sky-600 font-semibold text-lg hover:text-sky-700 transition-colors duration-200 cursor-pointer"
+          >
             <span>Ready to get started?</span>
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
             </svg>
-          </div>
+          </a>
         </div>
       </div>
     </section>
