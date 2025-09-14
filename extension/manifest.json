@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "CodeLens",
   "version": "1.0.0",
-  "description": "Real-time code complexity analysis with beautiful visualizations for web editors. Supports JS, Python, Java, C++, HTML, CSS",
+  "description": "See your code's complexity in real time",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
