@@ -117,7 +117,7 @@ const PrivacyPolicy = () => {
                       href="mailto:veerharischandrakar@gmail.com" 
                       className="text-blue-600 hover:text-blue-800 transition-colors"
                     >
-                      codelens@gmail.com
+                      codelensextension@gmail.com
                     </a>
                   </p>
                 </div>
