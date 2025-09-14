@@ -49,7 +49,7 @@
         "https://gist.github.com/*"
       ],
       "js": ["assets/esprima.js", "content.js"],
-      "css": ["content.css"],
+      "css": ["assets/content.css"],
       "run_at": "document_end",
       "all_frames": true,
       "match_about_blank": true
