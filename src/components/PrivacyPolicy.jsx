@@ -13,7 +13,7 @@ const PrivacyPolicy = () => {
             CodeLens 
           </p>
           <p className="text-sm text-gray-500 mt-2">
-            Last Updated: 12th September 2025
+            Last Updated: 16th September 2025
           </p>
         </div>
 
