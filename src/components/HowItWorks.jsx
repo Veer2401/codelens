@@ -76,7 +76,7 @@ const HowItWorks = () => {
         
         <div className="text-center mt-16">
           <a 
-            href="https://chromewebstore.google.com/category/extensions" 
+            href="https://chromewebstore.google.com/detail/codelens/ohkmocfpalkecaihkoljlkbglldpbadf?hl=en-GB&authuser=0" 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center space-x-2 text-sky-600 font-semibold text-lg hover:text-sky-700 transition-colors duration-200 cursor-pointer"

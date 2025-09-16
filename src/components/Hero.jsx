@@ -31,7 +31,7 @@ const Hero = () => {
         
   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <a
-              href="https://chromewebstore.google.com/category/extensions"
+              href="https://chromewebstore.google.com/detail/codelens/ohkmocfpalkecaihkoljlkbglldpbadf?hl=en-GB&authuser=0"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary text-2xl px-8 py-4 inline-block text-center"
