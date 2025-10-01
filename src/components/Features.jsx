@@ -71,10 +71,10 @@ const Features = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-">
           {features.map((feature, index) => (
             <CardContainer key={index} className="inter-var">
-              <CardBody className="bg-gray-800 relative group/card hover:shadow-2xl hover:shadow-sky-500/[0.1] border-gray-700 w-auto h-auto rounded-xl p-6 border">
+              <CardBody className="bg-gray-800 relative group/card hover:shadow-2xl hover:shadow-sky-500/[0.1] border-gray-700 w-80 h-60 rounded-xl p-6 border">
                 <CardItem translateZ="50" className="text-sky-600 mb-4">
                   {feature.icon}
                 </CardItem>

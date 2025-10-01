@@ -1,24 +1,35 @@
 import React from 'react'
+import Spotlight from './ui/spotlight'
 
 const Hero = () => {
   return (
-    <section className="py-20 px-4 bg-gray-900">
-      <div className="max-w-6xl mx-auto text-center">
+    <section className="relative py-20 px-4 bg-gray-900 overflow-hidden">
+      {/* Spotlight Effect - Behind content but visible */}
+      <Spotlight className="-top-40 left-1/4 md:-top-20 md:left-1/3 z-10" fill="white" />
+      
+      {/* Grid Background */}
+      <div className="absolute inset-0 pointer-events-none select-none opacity-20 z-20"
+           style={{
+             backgroundSize: '40px 40px',
+             backgroundImage: 'linear-gradient(to right, #374151 1px, transparent 1px), linear-gradient(to bottom, #374151 1px, transparent 1px)'
+           }} />
+      
+      <div className="relative z-30 max-w-6xl mx-auto text-center">
         <div className="mb-8">
           <div className="mx-auto mb-6 flex items-center justify-center">
             <div className="relative flex items-center justify-center w-32 h-32">
-              <span className="absolute w-36 h-36 rounded-full bg-sky-500 opacity-60 animate-fadePulse"></span>
+              <span className="absolute w-36 h-36 rounded-full bg-blue-100 opacity-80 animate-fadePulse"></span>
               <div className="bg-gray-800 rounded-full w-32 h-32 flex items-center justify-center shadow-lg border border-gray-700 relative z-10">
                 <img
                   src="code.jpg"
                   alt="CodeLens Logo"
-                  className="w-24 h-24 object-contain"
+                  className="w-32 h-32 object-cover rounded-full"
                 />
               </div>
             </div>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-sky-400 mb-6">
-             Code<span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-sky-300">
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent mb-6">
+             Code<span className="bg-gradient-to-r from-sky-400 to-sky-300 bg-clip-text text-transparent">
             Lens
             </span>
           </h1>
