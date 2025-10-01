@@ -2,13 +2,13 @@ import React from 'react'
 
 const Hero = () => {
   return (
-    <section className="py-20 px-4" style={{backgroundColor: '#eff6fe'}}>
+    <section className="py-20 px-4 bg-gray-900">
       <div className="max-w-6xl mx-auto text-center">
         <div className="mb-8">
           <div className="mx-auto mb-6 flex items-center justify-center">
             <div className="relative flex items-center justify-center w-32 h-32">
               <span className="absolute w-36 h-36 rounded-full bg-sky-500 opacity-60 animate-fadePulse"></span>
-              <div className="bg-white rounded-full w-32 h-32 flex items-center justify-center shadow relative z-10">
+              <div className="bg-gray-800 rounded-full w-32 h-32 flex items-center justify-center shadow-lg border border-gray-700 relative z-10">
                 <img
                   src="code.jpg"
                   alt="CodeLens Logo"
@@ -17,12 +17,12 @@ const Hero = () => {
               </div>
             </div>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-sky-600 mb-6">
-             Code<span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-sky-500">
+          <h1 className="text-5xl md:text-6xl font-bold text-sky-400 mb-6">
+             Code<span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-sky-300">
             Lens
             </span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
           Your Code quality, Visualized.
             {/* Code quality, visualized. */}
 

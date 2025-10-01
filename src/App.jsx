@@ -11,7 +11,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={
-          <div className="min-h-screen bg-blue-50">
+          <div className="min-h-screen bg-gray-900">
             <Hero />
             <HowItWorks />
             <Features />

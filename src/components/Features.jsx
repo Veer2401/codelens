@@ -1,4 +1,5 @@
 import React from 'react'
+import { CardBody, CardContainer, CardItem } from './ui/3d-card'
 
 const Features = () => {
   const features = [
@@ -59,33 +60,33 @@ const Features = () => {
   ]
 
   return (
-    <section className="py-20 px-4 gradient-bg">
+    <section className="py-20 px-4 bg-gray-900">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-white mb-4">
             Features for Better Code
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Our Chrome extension provides everything you need to understand and improve your code's complexity.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
           {features.map((feature, index) => (
-            <div key={index} className="card">
-              <div className="text-sky-600 mb-4">
-                {feature.icon}
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                {feature.description}
-              </p>
-            </div>
-            
+            <CardContainer key={index} className="inter-var">
+              <CardBody className="bg-gray-800 relative group/card hover:shadow-2xl hover:shadow-sky-500/[0.1] border-gray-700 w-auto h-auto rounded-xl p-6 border">
+                <CardItem translateZ="50" className="text-sky-600 mb-4">
+                  {feature.icon}
+                </CardItem>
+                <CardItem translateZ="60" className="text-xl font-semibold text-white mb-3">
+                  {feature.title}
+                </CardItem>
+                <CardItem as="p" translateZ="40" className="text-white leading-relaxed">
+                  {feature.description}
+                </CardItem>
+              </CardBody>
+            </CardContainer>
           ))}
-          
         </div>
       </div>
     </section>

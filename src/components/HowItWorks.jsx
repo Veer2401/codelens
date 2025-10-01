@@ -45,10 +45,10 @@ const HowItWorks = () => {
   ]
 
   return (
-    <section className="py-20 px-4" style={{backgroundColor: '#fff'}}>
+    <section className="py-20 px-4 bg-gray-800">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-white mb-4">
             How It Works
           </h2>
           {/* <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -60,14 +60,14 @@ const HowItWorks = () => {
           {steps.map((step, index) => (
             <div key={index} className="text-center group">
               <div className="mb-6">
-                <div className="w-24 h-24 mx-auto bg-white rounded-full shadow-lg flex items-center justify-center text-sky-600 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-24 h-24 mx-auto bg-gray-700 rounded-full shadow-lg flex items-center justify-center text-sky-400 group-hover:scale-110 transition-transform duration-300 border border-gray-600">
                   {step.icon}
                 </div>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              <h3 className="text-xl font-semibold text-white mb-3">
                 {step.title}
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-300 leading-relaxed">
                 {step.description}
               </p>
             </div>
@@ -79,7 +79,7 @@ const HowItWorks = () => {
             href="https://chromewebstore.google.com/detail/codelens/ohkmocfpalkecaihkoljlkbglldpbadf?hl=en-GB&authuser=0" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="inline-flex items-center space-x-2 text-sky-600 font-semibold text-lg hover:text-sky-700 transition-colors duration-200 cursor-pointer"
+            className="inline-flex items-center space-x-2 text-sky-400 font-semibold text-lg hover:text-sky-300 transition-colors duration-200 cursor-pointer"
           >
             <span>Ready to get started?</span>
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
