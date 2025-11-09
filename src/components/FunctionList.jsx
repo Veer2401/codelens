@@ -55,14 +55,14 @@ const FunctionList = ({ functions }) => {
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between text-sm text-slate-300 mb-4">
+    <div className="space-y-2">
+      <div className="flex items-center justify-between text-xs text-slate-300 mb-2">
         <span>Found {functions.length} functions</span>
         <span className="text-xs">Click to highlight</span>
       </div>
       
       {highlightError && (
-        <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-2xl text-sm text-red-200 backdrop-blur-sm">
+        <div className="p-2 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-200 backdrop-blur-sm">
           <div className="font-medium">Highlight Error:</div>
           <div>{highlightError}</div>
         </div>
@@ -71,27 +71,27 @@ const FunctionList = ({ functions }) => {
       {functions.map((func, index) => (
         <div
           key={index}
-          className={`border border-slate-600/50 rounded-2xl p-4 hover:border-violet-500/50 hover:bg-slate-700/30 transition-all duration-200 cursor-pointer group shadow-lg ${
-            highlightingFunction === func.name ? 'bg-violet-500/20 border-violet-500/50' : 'bg-slate-800/50'
+          className={`border border-slate-600/50 rounded-xl p-3 hover:border-blue-500/50 hover:bg-slate-700/30 transition-all duration-200 cursor-pointer group shadow-lg ${
+            highlightingFunction === func.name ? 'bg-blue-500/20 border-blue-500/50' : 'bg-slate-800/50'
           }`}
           onClick={() => handleFunctionClick(func)}
         >
-          <div className="flex items-center justify-between mb-2">
-            <div className="font-medium text-slate-100 group-hover:text-violet-300 transition-colors flex items-center">
+          <div className="flex items-center justify-between mb-1.5">
+            <div className="font-medium text-slate-100 group-hover:text-blue-300 transition-colors flex items-center text-sm">
               {(func.name || `Anonymous Function ${index + 1}`)}
               {func.count && func.count > 1 && (
                 <span className="ml-2 text-xs text-slate-400">× {func.count}</span>
               )}
               {highlightingFunction === func.name && (
-                <span className="ml-2 text-xs text-violet-400">⏳ Highlighting...</span>
+                <span className="ml-2 text-xs text-blue-400">⏳ Highlighting...</span>
               )}
             </div>
-            <div className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${getComplexityColor(func.complexity)}`}>
+            <div className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${getComplexityColor(func.complexity)}`}>
               {func.complexity}
             </div>
           </div>
           
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-xs">
             <div className="text-slate-400">
               {func.params && `${func.params.length} params`}
             </div>
@@ -101,7 +101,7 @@ const FunctionList = ({ functions }) => {
           </div>
           
           {func.complexity > 10 && (
-            <div className="mt-3 p-2.5 bg-yellow-500/10 border border-yellow-500/30 rounded-xl text-xs text-yellow-200 backdrop-blur-sm">
+            <div className="mt-2 p-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-xs text-yellow-200 backdrop-blur-sm">
               💡 Consider breaking this function into smaller, more focused functions
             </div>
           )}
@@ -109,33 +109,33 @@ const FunctionList = ({ functions }) => {
       ))}
       
       {/* Summary */}
-      <div className="mt-6 p-4 bg-slate-800/50 rounded-2xl border border-slate-600/30 backdrop-blur-sm">
-        <h4 className="font-semibold text-slate-100 mb-3 flex items-center">
-          <span className="mr-2">📊</span>
+      <div className="mt-3 p-3 bg-slate-800/50 rounded-xl border border-slate-600/30 backdrop-blur-sm">
+        <h4 className="font-semibold text-slate-100 mb-2 flex items-center text-sm">
+          <span className="mr-1.5">📊</span>
           Complexity Distribution
         </h4>
-        <div className="space-y-2 text-sm">
+        <div className="space-y-1.5 text-xs">
           <div className="flex justify-between items-center">
             <span className="text-green-400">Low (1-5):</span>
-            <span className="font-semibold text-slate-200 bg-green-500/20 px-2 py-1 rounded-full">
+            <span className="font-semibold text-slate-200 bg-green-500/20 px-2 py-0.5 rounded-full">
               {functions.filter(f => f.complexity <= 5).length}
             </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-blue-400">Medium (6-10):</span>
-            <span className="font-semibold text-slate-200 bg-blue-500/20 px-2 py-1 rounded-full">
+            <span className="font-semibold text-slate-200 bg-blue-500/20 px-2 py-0.5 rounded-full">
               {functions.filter(f => f.complexity > 5 && f.complexity <= 10).length}
             </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-yellow-400">High (11-15):</span>
-            <span className="font-semibold text-slate-200 bg-yellow-500/20 px-2 py-1 rounded-full">
+            <span className="font-semibold text-slate-200 bg-yellow-500/20 px-2 py-0.5 rounded-full">
               {functions.filter(f => f.complexity > 10 && f.complexity <= 15).length}
             </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-red-400">Extreme (16+):</span>
-            <span className="font-semibold text-slate-200 bg-red-500/20 px-2 py-1 rounded-full">
+            <span className="font-semibold text-slate-200 bg-red-500/20 px-2 py-0.5 rounded-full">
               {functions.filter(f => f.complexity > 15).length}
             </span>
           </div>

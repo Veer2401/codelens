@@ -176,12 +176,9 @@ const Popup = () => {
   return (
     <div className="w-96 h-[600px] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
-      <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white p-5 shadow-lg">
+      <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-800 text-white p-4 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-              <span className="text-lg">👁️</span>
-            </div>
             <h1 className="text-xl font-bold tracking-tight">CodeLens</h1>
           </div>
           <div className="flex items-center space-x-2">
@@ -194,27 +191,27 @@ const Popup = () => {
             </button>
           </div>
         </div>
-        <p className="text-purple-100 text-sm mt-2 font-light">
+        <p className="text-blue-100 text-xs mt-1 font-light">
           Real-time complexity analysis
         </p>
       </div>
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 p-3 mx-4 mt-4 rounded-2xl backdrop-blur-sm">
-          <div className="text-red-200 text-sm mb-2">
+        <div className="bg-red-500/10 border border-red-500/30 p-2 mx-3 mt-2 rounded-xl backdrop-blur-sm">
+          <div className="text-red-200 text-xs mb-1">
             <strong>Error:</strong> {error}
           </div>
           <div className="flex space-x-2">
             <button 
               onClick={handleRefresh}
-              className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs rounded-full transition-all duration-200"
+              className="px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs rounded-full transition-all duration-200"
             >
               Refresh
             </button>
             <button 
               onClick={getComplexityData}
-              className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs rounded-full transition-all duration-200"
+              className="px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs rounded-full transition-all duration-200"
             >
               Try again
             </button>
@@ -237,7 +234,7 @@ const Popup = () => {
       )}
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-slate-700/50 bg-slate-800/30 px-2 pt-2">
+      <div className="flex border-b border-slate-700/50 bg-slate-800/30 px-2 pt-1">
         {[
           { id: 'overview', label: 'Overview', icon: '📊' },
           { id: 'functions', label: 'Functions', icon: '🔍' },
@@ -246,59 +243,59 @@ const Popup = () => {
           <button
             key={tab.id}
             onClick={() => setCurrentTab(tab.id)}
-            className={`flex-1 py-3 px-4 text-sm font-medium transition-all duration-200 rounded-t-xl ${
+            className={`flex-1 py-2 px-3 text-sm font-medium transition-all duration-200 rounded-t-xl ${
               currentTab === tab.id
-                ? 'bg-gradient-to-b from-violet-600 to-violet-700 text-white shadow-lg'
+                ? 'bg-gradient-to-b from-blue-600 to-blue-700 text-white shadow-lg'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/30'
             }`}
           >
-            <span className="mr-2">{tab.icon}</span>
-            {tab.label}
+            <span className="mr-1 text-xs">{tab.icon}</span>
+            <span className="text-xs">{tab.label}</span>
           </button>
         ))}
       </div>
 
       {/* Content */}
-      <div className="p-4 overflow-y-auto h-[400px]">
+      <div className="p-3 overflow-y-auto h-[460px]">
         {currentTab === 'overview' && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <ComplexityScore
               score={getAverageComplexity()}
               label={getScoreLabel(getAverageComplexity())}
               colorClass={getScoreColor(getAverageComplexity())}
             />
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-2xl p-4 text-center border border-slate-600/30 shadow-lg">
-                <div className="text-3xl font-bold text-white truncate" title={complexityData.totalFunctions}>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-xl p-3 text-center border border-slate-600/30 shadow-lg">
+                <div className="text-2xl font-bold text-white truncate" title={complexityData.totalFunctions}>
                   {complexityData.totalFunctions}
                 </div>
-                <div className="text-sm text-slate-300 mt-1">Total Functions</div>
+                <div className="text-xs text-slate-300 mt-1">Total Functions</div>
               </div>
-              <div className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-2xl p-4 text-center border border-slate-600/30 shadow-lg">
-                <div className="text-3xl font-bold text-white truncate" title={getAverageComplexity().toFixed(2)}>
+              <div className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-xl p-3 text-center border border-slate-600/30 shadow-lg">
+                <div className="text-2xl font-bold text-white truncate" title={getAverageComplexity().toFixed(2)}>
                   {getAverageComplexity().toFixed(2)}
                 </div>
-                <div className="text-sm text-slate-300 mt-1">Avg Complexity</div>
+                <div className="text-xs text-slate-300 mt-1">Avg Complexity</div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-violet-600/20 to-purple-600/20 border border-violet-500/30 rounded-2xl p-4 backdrop-blur-sm">
-              <h3 className="font-semibold text-violet-200 mb-3 flex items-center">
-                <span className="mr-2">💡</span>
+            <div className="bg-gradient-to-br from-blue-600/20 to-blue-700/20 border border-blue-500/30 rounded-xl p-3 backdrop-blur-sm">
+              <h3 className="font-semibold text-blue-200 mb-2 flex items-center text-sm">
+                <span className="mr-1.5">💡</span>
                 Quick Tips
               </h3>
-              <ul className="text-sm text-violet-100 space-y-2">
+              <ul className="text-xs text-blue-100 space-y-1.5">
                 <li className="flex items-start">
-                  <span className="mr-2">•</span>
+                  <span className="mr-1.5">•</span>
                   <span>Keep functions under 10 complexity</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="mr-2">•</span>
+                  <span className="mr-1.5">•</span>
                   <span>Break down complex functions</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="mr-2">•</span>
+                  <span className="mr-1.5">•</span>
                   <span>Use early returns to reduce nesting</span>
                 </li>
               </ul>
@@ -308,10 +305,10 @@ const Popup = () => {
             <button 
               onClick={handleAnalyzeClick}
               disabled={isAnalyzing || !isSupportedPlatform}
-              className="w-full bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white font-semibold py-4 px-6 rounded-2xl flex items-center justify-center space-x-2 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-violet-500/50 hover:scale-[1.02] active:scale-95"
+              className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white font-semibold py-3 px-5 rounded-xl flex items-center justify-center space-x-2 hover:from-blue-500 hover:via-blue-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-blue-500/50 hover:scale-[1.02] active:scale-95"
             >
-              <span className="text-lg">{isAnalyzing ? '⏳' : '🔍'}</span>
-              <span>{isAnalyzing ? 'Analyzing...' : 'Analyze Code'}</span>
+              <span className="text-base">{isAnalyzing ? '⏳' : '🔍'}</span>
+              <span className="text-sm">{isAnalyzing ? 'Analyzing...' : 'Analyze'}</span>
             </button>
           </div>
         )}
@@ -326,13 +323,9 @@ const Popup = () => {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-slate-700/50 p-3 bg-slate-800/30 backdrop-blur-sm">
-        <div className="flex items-center justify-between text-xs text-slate-400">
-          <span className="flex items-center">
-            <span className="mr-1">⚡</span>
-            Powered by Esprima
-          </span>
-          <span className="px-2 py-1 bg-violet-500/20 text-violet-300 rounded-full">v1.1.0</span>
+      <div className="border-t border-slate-700/50 p-2 bg-slate-800/30 backdrop-blur-sm">
+        <div className="flex items-center justify-center text-xs text-slate-400">
+          <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full">v1.1.0</span>
         </div>
       </div>
     </div>

@@ -2,6 +2,18 @@
 
 A powerful Chrome extension that provides real-time code complexity analysis with beautiful visualizations for web-based editors. **Now supporting multiple programming languages!**
 
+## 🎨 Version 1.1.0 - Modern Dark Theme!
+
+CodeLens now features a stunning modern dark theme with:
+- 🌙 **Sleek Dark Gradient Background** - Professional slate-900/800 gradient
+- 💜 **Violet/Purple Accents** - Beautiful color scheme throughout
+- ⚡ **Smooth Animations** - Hover effects and transitions
+- 🔘 **Rounded Design** - Modern rounded buttons and cards
+- ✨ **Glass-morphism Effects** - Backdrop blur for depth
+- 🎯 **Enhanced UX** - Better visual hierarchy and readability
+
+[See CHANGELOG.md for full details](CHANGELOG.md)
+
 ## 🌟 **New Multi-Language Support**
 
 CodeLens now supports **20+ programming languages** including:

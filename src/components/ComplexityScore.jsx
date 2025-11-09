@@ -11,16 +11,16 @@ const ComplexityScore = ({ score, label, colorClass }) => {
   }
   
   return (
-    <div className="text-center bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-600/30 shadow-lg">
-      <div className="text-5xl font-bold mb-2 bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+    <div className="text-center bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-xl p-4 border border-slate-600/30 shadow-lg">
+      <div className="text-4xl font-bold mb-1.5 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
         {formattedScore}
       </div>
-      <div className="text-lg text-slate-300 mb-4 font-medium">{label}</div>
+      <div className="text-sm text-slate-300 mb-3 font-medium">{label}</div>
       
       {/* Progress bar */}
-      <div className="w-full bg-slate-700/50 rounded-full h-3 mb-4 overflow-hidden shadow-inner">
+      <div className="w-full bg-slate-700/50 rounded-full h-2 mb-3 overflow-hidden shadow-inner">
         <div 
-          className={`h-3 rounded-full transition-all duration-500 ${getBarColor(score)} shadow-lg`}
+          className={`h-2 rounded-full transition-all duration-500 ${getBarColor(score)} shadow-lg`}
           style={{ 
             width: `${Math.min((score / 20) * 100, 100)}%` 
           }}
@@ -28,7 +28,7 @@ const ComplexityScore = ({ score, label, colorClass }) => {
       </div>
       
       {/* Complexity explanation */}
-      <div className="text-sm text-slate-400">
+      <div className="text-xs text-slate-400">
         {score <= 5 && "🎉 Excellent - Keep it up!"}
         {score > 5 && score <= 10 && "👍 Good - Consider some improvements"}
         {score > 10 && score <= 15 && "⚠️ Fair - Needs refactoring"}
