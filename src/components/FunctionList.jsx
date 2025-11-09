@@ -5,9 +5,9 @@ const FunctionList = ({ functions }) => {
   const [highlightError, setHighlightError] = useState(null)
 
   const getComplexityColor = (complexity) => {
-    if (complexity <= 10) return 'text-complexity-low bg-complexity-low/10'
-    if (complexity <= 15) return 'text-complexity-high bg-complexity-high/10'
-    return 'text-complexity-extreme bg-complexity-extreme/10'
+    if (complexity <= 10) return 'text-green-400 bg-green-500/20 border-green-500/30'
+    if (complexity <= 15) return 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30'
+    return 'text-red-400 bg-red-500/20 border-red-500/30'
   }
 
   const getComplexityLabel = (complexity) => {
@@ -46,7 +46,7 @@ const FunctionList = ({ functions }) => {
 
   if (!functions || functions.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-slate-400">
         <div className="text-4xl mb-2">🔍</div>
         <div className="text-sm">No functions analyzed yet</div>
         {/* <div className="text-xs mt-1">Click "Analyze" to start</div> */}
@@ -56,13 +56,13 @@ const FunctionList = ({ functions }) => {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
+      <div className="flex items-center justify-between text-sm text-slate-300 mb-4">
         <span>Found {functions.length} functions</span>
-        <span className="text-xs">Click function to highlight in code</span>
+        <span className="text-xs">Click to highlight</span>
       </div>
       
       {highlightError && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+        <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-2xl text-sm text-red-200 backdrop-blur-sm">
           <div className="font-medium">Highlight Error:</div>
           <div>{highlightError}</div>
         </div>
@@ -71,37 +71,37 @@ const FunctionList = ({ functions }) => {
       {functions.map((func, index) => (
         <div
           key={index}
-          className={`border border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors cursor-pointer group ${
-            highlightingFunction === func.name ? 'bg-blue-50 border-blue-300' : ''
+          className={`border border-slate-600/50 rounded-2xl p-4 hover:border-violet-500/50 hover:bg-slate-700/30 transition-all duration-200 cursor-pointer group shadow-lg ${
+            highlightingFunction === func.name ? 'bg-violet-500/20 border-violet-500/50' : 'bg-slate-800/50'
           }`}
           onClick={() => handleFunctionClick(func)}
         >
           <div className="flex items-center justify-between mb-2">
-            <div className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors flex items-center">
+            <div className="font-medium text-slate-100 group-hover:text-violet-300 transition-colors flex items-center">
               {(func.name || `Anonymous Function ${index + 1}`)}
               {func.count && func.count > 1 && (
-                <span className="ml-2 text-xs text-gray-500">- {func.count}</span>
+                <span className="ml-2 text-xs text-slate-400">× {func.count}</span>
               )}
               {highlightingFunction === func.name && (
-                <span className="ml-2 text-xs text-blue-600">⏳ Highlighting...</span>
+                <span className="ml-2 text-xs text-violet-400">⏳ Highlighting...</span>
               )}
             </div>
-            <div className={`px-2 py-1 rounded-full text-xs font-medium ${getComplexityColor(func.complexity)}`}>
+            <div className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${getComplexityColor(func.complexity)}`}>
               {func.complexity}
             </div>
           </div>
           
           <div className="flex items-center justify-between text-sm">
-            <div className="text-gray-600">
+            <div className="text-slate-400">
               {func.params && `${func.params.length} params`}
             </div>
-            <div className={`text-xs font-medium ${getComplexityColor(func.complexity)}`}>
+            <div className={`text-xs font-medium ${getComplexityColor(func.complexity).split(' ')[0]}`}>
               {getComplexityLabel(func.complexity)}
             </div>
           </div>
           
           {func.complexity > 10 && (
-            <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+            <div className="mt-3 p-2.5 bg-yellow-500/10 border border-yellow-500/30 rounded-xl text-xs text-yellow-200 backdrop-blur-sm">
               💡 Consider breaking this function into smaller, more focused functions
             </div>
           )}
@@ -109,30 +109,33 @@ const FunctionList = ({ functions }) => {
       ))}
       
       {/* Summary */}
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-        <h4 className="font-semibold text-gray-900 mb-2">Complexity Distribution</h4>
+      <div className="mt-6 p-4 bg-slate-800/50 rounded-2xl border border-slate-600/30 backdrop-blur-sm">
+        <h4 className="font-semibold text-slate-100 mb-3 flex items-center">
+          <span className="mr-2">📊</span>
+          Complexity Distribution
+        </h4>
         <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-complexity-low">Low (1-5):</span>
-            <span className="font-medium">
+          <div className="flex justify-between items-center">
+            <span className="text-green-400">Low (1-5):</span>
+            <span className="font-semibold text-slate-200 bg-green-500/20 px-2 py-1 rounded-full">
               {functions.filter(f => f.complexity <= 5).length}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-complexity-medium">Medium (6-10):</span>
-            <span className="font-medium">
+          <div className="flex justify-between items-center">
+            <span className="text-blue-400">Medium (6-10):</span>
+            <span className="font-semibold text-slate-200 bg-blue-500/20 px-2 py-1 rounded-full">
               {functions.filter(f => f.complexity > 5 && f.complexity <= 10).length}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-complexity-high">High (11-15):</span>
-            <span className="font-medium">
+          <div className="flex justify-between items-center">
+            <span className="text-yellow-400">High (11-15):</span>
+            <span className="font-semibold text-slate-200 bg-yellow-500/20 px-2 py-1 rounded-full">
               {functions.filter(f => f.complexity > 10 && f.complexity <= 15).length}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-complexity-extreme">Extreme (16+):</span>
-            <span className="font-medium">
+          <div className="flex justify-between items-center">
+            <span className="text-red-400">Extreme (16+):</span>
+            <span className="font-semibold text-slate-200 bg-red-500/20 px-2 py-1 rounded-full">
               {functions.filter(f => f.complexity > 15).length}
             </span>
           </div>

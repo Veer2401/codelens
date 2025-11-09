@@ -174,33 +174,47 @@ const Popup = () => {
   
 
   return (
-    <div className="w-96 h-[600px] bg-white">
+    <div className="w-96 h-[600px] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
-      <div className="bg-gradient-to-r from-sky-600 to-sky-500 text-white p-4">
+      <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white p-5 shadow-lg">
         <div className="flex items-center justify-between">
-          <h1 className="text-lg font-bold">CodeLens</h1>
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+              <span className="text-lg">👁️</span>
+            </div>
+            <h1 className="text-xl font-bold tracking-tight">CodeLens</h1>
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={handleRefresh}
+              className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-200 hover:scale-105"
+              title="Refresh"
+            >
+              <span className="text-sm">🔄</span>
+            </button>
+          </div>
         </div>
-        <p className="text-sky-100 text-sm mt-1">
+        <p className="text-purple-100 text-sm mt-2 font-light">
           Real-time complexity analysis
         </p>
       </div>
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 p-3 mx-4 mt-4 rounded-lg">
-          <div className="text-red-800 text-sm mb-2">
+        <div className="bg-red-500/10 border border-red-500/30 p-3 mx-4 mt-4 rounded-2xl backdrop-blur-sm">
+          <div className="text-red-200 text-sm mb-2">
             <strong>Error:</strong> {error}
           </div>
           <div className="flex space-x-2">
             <button 
               onClick={handleRefresh}
-              className="text-red-600 hover:text-red-800 text-xs underline"
+              className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs rounded-full transition-all duration-200"
             >
               Refresh
             </button>
             <button 
               onClick={getComplexityData}
-              className="text-red-600 hover:text-red-800 text-xs underline"
+              className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs rounded-full transition-all duration-200"
             >
               Try again
             </button>
@@ -210,19 +224,20 @@ const Popup = () => {
 
       {/* Platform Info */}
       {currentUrl && (
-        <div className="px-4 py-2 bg-gray-50 text-xs text-gray-600">
+        <div className="px-4 py-2 bg-slate-800/50 text-xs text-slate-300 border-b border-slate-700/50">
           <div className="flex items-center justify-between">
-            <div>
-              <strong>Current page:</strong> {new URL(currentUrl).hostname}
-              {isSupportedPlatform && <span className="text-green-600 ml-2">✓ Supported</span>}
-              {!isSupportedPlatform && <span className="text-red-600 ml-2">✗ Not supported</span>}
+            <div className="flex items-center space-x-2">
+              <span className="font-medium text-slate-400">Platform:</span>
+              <span className="text-slate-200">{new URL(currentUrl).hostname}</span>
+              {isSupportedPlatform && <span className="px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full text-xs">✓ Supported</span>}
+              {!isSupportedPlatform && <span className="px-2 py-0.5 bg-red-500/20 text-red-300 rounded-full text-xs">✗ Not supported</span>}
             </div>
           </div>
         </div>
       )}
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-slate-700/50 bg-slate-800/30 px-2 pt-2">
         {[
           { id: 'overview', label: 'Overview', icon: '📊' },
           { id: 'functions', label: 'Functions', icon: '🔍' },
@@ -231,10 +246,10 @@ const Popup = () => {
           <button
             key={tab.id}
             onClick={() => setCurrentTab(tab.id)}
-            className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
+            className={`flex-1 py-3 px-4 text-sm font-medium transition-all duration-200 rounded-t-xl ${
               currentTab === tab.id
-                ? 'text-sky-600 border-b-2 border-sky-600'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-gradient-to-b from-violet-600 to-violet-700 text-white shadow-lg'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/30'
             }`}
           >
             <span className="mr-2">{tab.icon}</span>
@@ -254,26 +269,38 @@ const Popup = () => {
             />
             
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-gray-900 truncate" title={complexityData.totalFunctions}>
+              <div className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-2xl p-4 text-center border border-slate-600/30 shadow-lg">
+                <div className="text-3xl font-bold text-white truncate" title={complexityData.totalFunctions}>
                   {complexityData.totalFunctions}
                 </div>
-                <div className="text-sm text-gray-600">Total Functions</div>
+                <div className="text-sm text-slate-300 mt-1">Total Functions</div>
               </div>
-              <div className="bg-gray-50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-gray-900 truncate" title={getAverageComplexity().toFixed(2)}>
+              <div className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-2xl p-4 text-center border border-slate-600/30 shadow-lg">
+                <div className="text-3xl font-bold text-white truncate" title={getAverageComplexity().toFixed(2)}>
                   {getAverageComplexity().toFixed(2)}
                 </div>
-                <div className="text-sm text-gray-600">Avg Complexity</div>
+                <div className="text-sm text-slate-300 mt-1">Avg Complexity</div>
               </div>
             </div>
 
-            <div className="bg-sky-50 border border-sky-200 rounded-lg p-4">
-              <h3 className="font-semibold text-sky-900 mb-2">Quick Tips</h3>
-              <ul className="text-sm text-sky-800 space-y-1">
-                <li>• Keep functions under 10 complexity</li>
-                <li>• Break down complex functions</li>
-                <li>• Use early returns to reduce nesting</li>
+            <div className="bg-gradient-to-br from-violet-600/20 to-purple-600/20 border border-violet-500/30 rounded-2xl p-4 backdrop-blur-sm">
+              <h3 className="font-semibold text-violet-200 mb-3 flex items-center">
+                <span className="mr-2">💡</span>
+                Quick Tips
+              </h3>
+              <ul className="text-sm text-violet-100 space-y-2">
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>Keep functions under 10 complexity</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>Break down complex functions</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>Use early returns to reduce nesting</span>
+                </li>
               </ul>
             </div>
 
@@ -281,9 +308,9 @@ const Popup = () => {
             <button 
               onClick={handleAnalyzeClick}
               disabled={isAnalyzing || !isSupportedPlatform}
-              className="w-full bg-gradient-to-r from-sky-600 to-sky-500 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center space-x-2 hover:from-sky-700 hover:to-sky-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white font-semibold py-4 px-6 rounded-2xl flex items-center justify-center space-x-2 hover:from-violet-500 hover:via-purple-500 hover:to-indigo-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-violet-500/50 hover:scale-[1.02] active:scale-95"
             >
-              <span>🔍</span>
+              <span className="text-lg">{isAnalyzing ? '⏳' : '🔍'}</span>
               <span>{isAnalyzing ? 'Analyzing...' : 'Analyze Code'}</span>
             </button>
           </div>
@@ -299,10 +326,13 @@ const Popup = () => {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-gray-200 p-3 bg-gray-50">
-        <div className="flex items-center justify-between text-xs text-gray-500">
-          <span>Powered by Esprima</span>
-          <span>v1.0.0</span>
+      <div className="border-t border-slate-700/50 p-3 bg-slate-800/30 backdrop-blur-sm">
+        <div className="flex items-center justify-between text-xs text-slate-400">
+          <span className="flex items-center">
+            <span className="mr-1">⚡</span>
+            Powered by Esprima
+          </span>
+          <span className="px-2 py-1 bg-violet-500/20 text-violet-300 rounded-full">v1.1.0</span>
         </div>
       </div>
     </div>
