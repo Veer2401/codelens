@@ -3,58 +3,72 @@ import Spotlight from './ui/spotlight'
 
 const Hero = () => {
   return (
-    <section className="relative py-20 px-4 bg-gray-900 overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center py-20 px-4 overflow-hidden">
       {/* Spotlight Effect - Behind content but visible */}
-      <Spotlight className="-top-40 left-1/4 md:-top-20 md:left-1/3 z-10" fill="white" />
+      <Spotlight className="-top-40 left-1/4 md:-top-20 md:left-1/3 z-10" fill="rgba(147, 197, 253, 0.5)" />
       
-      {/* Grid Background */}
-      <div className="absolute inset-0 pointer-events-none select-none opacity-20 z-20"
+      {/* Grid Background with glassmorphism */}
+      <div className="absolute inset-0 pointer-events-none select-none opacity-10 z-20"
            style={{
-             backgroundSize: '40px 40px',
-             backgroundImage: 'linear-gradient(to right, #374151 1px, transparent 1px), linear-gradient(to bottom, #374151 1px, transparent 1px)'
+             backgroundSize: '60px 60px',
+             backgroundImage: 'linear-gradient(to right, rgba(147, 197, 253, 0.3) 1px, transparent 1px), linear-gradient(to bottom, rgba(147, 197, 253, 0.3) 1px, transparent 1px)'
            }} />
       
       <div className="relative z-30 max-w-6xl mx-auto text-center">
-        <div className="mb-8">
-          <div className="mx-auto mb-6 flex items-center justify-center">
-            <div className="relative flex items-center justify-center w-32 h-32">
-              <span className="absolute w-36 h-36 rounded-full bg-blue-100 opacity-80 animate-fadePulse"></span>
-              <div className="bg-gray-800 rounded-full w-32 h-32 flex items-center justify-center shadow-lg border border-gray-700 relative z-10">
+        <div className="mb-12">
+          <div className="mx-auto mb-8 flex items-center justify-center">
+            <div className="relative flex items-center justify-center w-40 h-40">
+              {/* Animated glow rings */}
+              <span className="absolute w-44 h-44 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 opacity-40 animate-fadePulse blur-xl"></span>
+              <span className="absolute w-48 h-48 rounded-full bg-gradient-to-r from-cyan-400 to-blue-400 opacity-30 animate-fadePulse blur-2xl" style={{animationDelay: '0.5s'}}></span>
+              
+              {/* Glass container */}
+              <div className="relative z-10 rounded-full w-40 h-40 flex items-center justify-center" style={{
+                background: 'rgba(30, 41, 59, 0.4)',
+                backdropFilter: 'blur(20px)',
+                border: '2px solid rgba(255, 255, 255, 0.2)',
+                boxShadow: '0 8px 32px rgba(59, 130, 246, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
+              }}>
                 <img
                   src="code.jpg"
                   alt="CodeLens Logo"
-                  className="w-32 h-32 object-cover rounded-full"
+                  className="w-36 h-36 object-cover rounded-full"
                 />
               </div>
             </div>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent mb-6">
-             Code<span className="bg-gradient-to-r from-sky-400 to-sky-300 bg-clip-text text-transparent">
-            Lens
+          
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight">
+            <span className="bg-gradient-to-b from-white via-blue-50 to-blue-100 bg-clip-text text-transparent drop-shadow-2xl">
+              Code
+            </span>
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              Lens
             </span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-          Your Code quality, Visualized.
-            {/* Code quality, visualized. */}
-
+          
+          <p className="text-xl md:text-2xl lg:text-3xl font-light max-w-4xl mx-auto leading-relaxed mb-8" style={{
+            background: 'linear-gradient(to right, rgba(203, 213, 225, 0.9), rgba(148, 163, 184, 0.9))',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            Your Code Quality, Visualized.
           </p>
         </div>
         
-  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <a
-              href="https://chromewebstore.google.com/detail/codelens/ohkmocfpalkecaihkoljlkbglldpbadf?hl=en-GB&authuser=0"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary text-2xl px-8 py-4 inline-block text-center"
-            >
-              Add to Chrome
-            </a>
-          {/* <a href="/demo.html" target="_blank" rel="noopener noreferrer" className="btn-secondary text-lg px-8 py-4 inline-block">
-            <svg className="w-6 h-6 inline mr-2" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+          <a
+            href="https://chromewebstore.google.com/detail/codelens/ohkmocfpalkecaihkoljlkbglldpbadf?hl=en-GB&authuser=0"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary text-xl md:text-2xl px-12 py-5 inline-flex items-center gap-3 group"
+          >
+            Add to Chrome
+            <svg className="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
-            View Demo
-          </a> */}
+          </a>
         </div>
         
         

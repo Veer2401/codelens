@@ -45,47 +45,57 @@ const HowItWorks = () => {
   ]
 
   return (
-    <section className="py-20 px-4 bg-gray-800">
-      <div className="max-w-6xl mx-auto">
+    <section className="relative py-20 px-4 overflow-hidden">
+      {/* Background blur elements */}
+      <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 right-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
+      
+      <div className="max-w-6xl mx-auto relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-white mb-4">
-            How It Works
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <span className="bg-gradient-to-r from-white via-blue-50 to-blue-100 bg-clip-text text-transparent">
+              How It Works
+            </span>
           </h2>
-          {/* <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Getting started with CodeLens is simple and takes just a few steps.
-          </p> */}
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {steps.map((step, index) => (
-            <div key={index} className="text-center group">
-              <div className="mb-6">
-                <div className="w-24 h-24 mx-auto bg-gray-700 rounded-full shadow-lg flex items-center justify-center text-sky-400 group-hover:scale-110 transition-transform duration-300 border border-gray-600">
-                  {step.icon}
+            <div key={index} className="group h-full">
+              <div className="h-full flex flex-col items-center text-center p-6 rounded-3xl transition-all duration-500 group-hover:scale-105 group-hover:shadow-2xl" style={{
+                background: 'rgba(15, 23, 42, 0.3)',
+                backdropFilter: 'blur(24px) saturate(180%)',
+                border: '1px solid rgba(255, 255, 255, 0.125)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                minHeight: '360px'
+              }} onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(30, 41, 59, 0.4)';
+                e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+              }} onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(15, 23, 42, 0.3)';
+                e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.125)';
+              }}>
+                <div className="mb-6 mt-2">
+                  <div className="w-20 h-20 mx-auto rounded-full shadow-lg flex items-center justify-center text-blue-400 transition-all duration-500 group-hover:text-cyan-400" style={{
+                    background: 'rgba(59, 130, 246, 0.1)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(59, 130, 246, 0.3)',
+                    boxShadow: '0 4px 24px rgba(59, 130, 246, 0.2)'
+                  }}>
+                    <div className="scale-75">
+                      {step.icon}
+                    </div>
+                  </div>
                 </div>
+                <h3 className="text-xl font-semibold text-white mb-4 px-2">
+                  {step.title}
+                </h3>
+                <p className="text-slate-300 leading-relaxed text-sm flex-grow px-2">
+                  {step.description}
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">
-                {step.title}
-              </h3>
-              <p className="text-gray-300 leading-relaxed">
-                {step.description}
-              </p>
             </div>
           ))}
-        </div>
-        
-        <div className="text-center mt-16">
-          <a 
-            href="https://chromewebstore.google.com/detail/codelens/ohkmocfpalkecaihkoljlkbglldpbadf?hl=en-GB&authuser=0" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center space-x-2 text-sky-400 font-semibold text-lg hover:text-sky-300 transition-colors duration-200 cursor-pointer"
-          >
-            <span>Ready to get started?</span>
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-            </svg>
-          </a>
         </div>
       </div>
     </section>
