@@ -300,16 +300,6 @@ const Popup = () => {
                 </li>
               </ul>
             </div>
-
-            {/* Analyze Code Button */}
-            <button 
-              onClick={handleAnalyzeClick}
-              disabled={isAnalyzing || !isSupportedPlatform}
-              className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white font-semibold py-3 px-5 rounded-xl flex items-center justify-center space-x-2 hover:from-blue-500 hover:via-blue-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-blue-500/50 hover:scale-[1.02] active:scale-95"
-            >
-              <span className="text-base">{isAnalyzing ? '⏳' : '🔍'}</span>
-              <span className="text-sm">{isAnalyzing ? 'Analyzing...' : 'Analyze'}</span>
-            </button>
           </div>
         )}
 
@@ -325,7 +315,7 @@ const Popup = () => {
       {/* Footer */}
       <div className="border-t border-slate-700/50 p-2 bg-slate-800/30 backdrop-blur-sm">
         <div className="flex items-center justify-center text-xs text-slate-400">
-          <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full">v1.1.0</span>
+          {/* Footer content */}
         </div>
       </div>
     </div>

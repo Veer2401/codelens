@@ -243,6 +243,19 @@ class CodeLensAnalyzer {
     document.body.appendChild(widget)
     this.floatingWidget = widget
     
+    // Load saved position or set default
+    const savedPos = this.loadWidgetPosition()
+    if (savedPos) {
+      widget.style.left = savedPos.left + 'px'
+      widget.style.top = savedPos.top + 'px'
+    } else {
+      widget.style.left = '20px'
+      widget.style.top = '20px'
+    }
+    
+    // Make the icon draggable
+    this.makeIconDraggable(widget, iconBtn)
+    
     // Toggle expand/collapse on icon click
     iconBtn.addEventListener('click', (e) => {
       e.stopPropagation()

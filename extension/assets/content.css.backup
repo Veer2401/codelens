@@ -2,9 +2,9 @@
 
 /* Floating Widget */
 .codelens-widget {
-  position: fixed;
-  top: 100px;
-  right: 20px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
   width: 260px;
   min-height: 220px;
   max-height: 260px;
@@ -58,7 +58,7 @@
   border-radius: 50%;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: move;
   font-size: 24px;
   user-select: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -304,10 +304,8 @@
     width: calc(100vw - 20px) !important;
     max-width: calc(100vw - 20px) !important;
     min-width: 280px !important;
-    right: 10px !important;
-    top: 10px !important;
     margin: 0 !important;
-    position: fixed !important;
+    position: absolute !important;
     z-index: 2147483647 !important;
   }
   
@@ -349,10 +347,8 @@
   .codelens-show-widget {
     width: 48px !important;
     height: 48px !important;
-    right: 10px !important;
-    top: 10px !important;
     font-size: 20px !important;
-    position: fixed !important;
+    position: absolute !important;
     z-index: 2147483647 !important;
   }
 }
@@ -363,8 +359,6 @@
     width: calc(100vw - 16px) !important;
     max-width: calc(100vw - 16px) !important;
     min-width: 260px !important;
-    right: 8px !important;
-    top: 8px !important;
   }
   
   .codelens-widget.codelens-collapsed {
@@ -404,8 +398,6 @@
   .codelens-show-widget {
     width: 44px !important;
     height: 44px !important;
-    right: 8px !important;
-    top: 8px !important;
     font-size: 18px !important;
   }
 }
@@ -414,9 +406,7 @@
   .codelens-widget {
     width: 240px !important;
     max-width: 240px !important;
-    right: 15px !important;
-    top: 15px !important;
-    position: fixed !important;
+    position: absolute !important;
     z-index: 2147483647 !important;
   }
   
@@ -444,10 +434,8 @@
   .codelens-show-widget {
     width: 52px !important;
     height: 52px !important;
-    right: 15px !important;
-    top: 15px !important;
     font-size: 22px !important;
-    position: fixed !important;
+    position: absolute !important;
     z-index: 2147483647 !important;
   }
 }
@@ -456,9 +444,7 @@
   .codelens-widget {
     width: 250px !important;
     max-width: 250px !important;
-    right: 18px !important;
-    top: 18px !important;
-    position: fixed !important;
+    position: absolute !important;
     z-index: 2147483647 !important;
   }
   
@@ -476,9 +462,7 @@
   .codelens-show-widget {
     width: 56px !important;
     height: 56px !important;
-    right: 18px !important;
-    top: 18px !important;
-    position: fixed !important;
+    position: absolute !important;
     z-index: 2147483647 !important;
   }
 }
@@ -488,9 +472,7 @@
   .codelens-widget {
     width: 260px !important;
     max-width: 260px !important;
-    right: 20px !important;
-    top: 20px !important;
-    position: fixed !important;
+    position: absolute !important;
     z-index: 2147483647 !important;
   }
   
@@ -508,9 +490,7 @@
   .codelens-show-widget {
     width: 56px !important;
     height: 56px !important;
-    right: 20px !important;
-    top: 20px !important;
-    position: fixed !important;
+    position: absolute !important;
     z-index: 2147483647 !important;
   }
 }
@@ -600,7 +580,7 @@
 
 /* Show Widget Button (when widget is hidden) */
 .codelens-show-widget {
-  position: fixed;
+  position: absolute;
   width: 56px;
   height: 56px;
   background: #ffffff;
@@ -609,14 +589,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: move;
   z-index: 2147483647;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
   font-size: 24px;
   user-select: none;
-  right: 20px;
-  top: 100px;
+  left: 20px;
+  top: 20px;
   transform: translateZ(0);
   will-change: transform;
 }
