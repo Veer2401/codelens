@@ -23,6 +23,7 @@ class CodeLensAnalyzer {
     this.analysisQueued = false
     this.reanalyzeTimer = null
     this.lastPrimaryHash = ''
+    this.lastCodeLength = 0
     this.lastAnalyzeAt = 0
     this.lastGoodComplexityData = null
     this.userMinimized = false
@@ -437,15 +438,34 @@ class CodeLensAnalyzer {
       const { code } = this.getPrimaryCodeText()
       const text = code || ''
       // Require a reasonable amount of code to avoid transient empty states
-      if (text.trim().length < 30) return
-      // Rate-limit frequent re-analysis during scroll
-      if (Date.now() - this.lastAnalyzeAt < 1200) return
-      const hash = this.computeHash(text)
-      if (hash && hash === this.lastPrimaryHash) {
+      if (text.trim().length < 30) {
+        // Don't clear existing data if code temporarily disappears during scroll
+        console.log('CodeLens: Skipping re-analysis - insufficient code detected')
         return
       }
+      // Rate-limit frequent re-analysis during scroll
+      if (Date.now() - this.lastAnalyzeAt < 2000) {
+        console.log('CodeLens: Skipping re-analysis - rate limited')
+        return
+      }
+      const hash = this.computeHash(text)
+      if (hash && hash === this.lastPrimaryHash) {
+        console.log('CodeLens: Skipping re-analysis - content unchanged')
+        return
+      }
+      // Only re-analyze if new code is significantly longer (indicates more content loaded)
+      // or if we have no data yet
+      if (this.lastGoodComplexityData && this.lastGoodComplexityData.totalFunctions > 0 && this.lastCodeLength > 0) {
+        const currentLength = text.length
+        // Don't re-analyze if code got significantly shorter (virtual scrolling removing lines)
+        if (currentLength < this.lastCodeLength * 0.7) {
+          console.log('CodeLens: Skipping re-analysis - code shortened from', this.lastCodeLength, 'to', currentLength, '(likely virtual scroll)')
+          return
+        }
+      }
+      this.lastCodeLength = text.length
       this.analyzePageCode()
-    }, 750)
+    }, 1500)
   }
 
   computeHash(text) {
@@ -509,6 +529,7 @@ class CodeLensAnalyzer {
     }
     await this.analyzeCodeFromText(primaryCode, languageHint)
     this.lastPrimaryHash = currentHash
+    this.lastCodeLength = primaryCode.length
     this.showFloatingWidget()
     
     console.log('CodeLens: Analysis complete:', this.complexityData)
@@ -575,7 +596,27 @@ class CodeLensAnalyzer {
   }
 
   getPrimaryCodeText() {
-    // Try GitHub file view lines
+    // Try GitHub file view - get ALL code including virtualized content
+    // GitHub stores the full content even if not all lines are rendered
+    const ghFileContent = document.querySelector('.blob-wrapper')
+    if (ghFileContent) {
+      // Try to get from data attributes or full content
+      const table = ghFileContent.querySelector('table')
+      if (table) {
+        const allLines = table.querySelectorAll('tr')
+        if (allLines && allLines.length > 0) {
+          const code = Array.from(allLines).map(tr => {
+            const codeCell = tr.querySelector('.blob-code-inner, .blob-code')
+            return codeCell ? (codeCell.textContent || '') : ''
+          }).join('\n')
+          if (code.trim().length > 50) {
+            return { code, languageHint: this.detectLanguage(`file.${this.getFileExtension()}`, code) }
+          }
+        }
+      }
+    }
+    
+    // Try GitHub file view lines (visible only)
     let ghLines = document.querySelectorAll('.blob-code-inner')
     if (ghLines && ghLines.length > 0) {
       const code = Array.from(ghLines).map(n => n.textContent || '').join('\n')
@@ -1738,14 +1779,140 @@ class CodeLensAnalyzer {
       console.log('CodeLens: Found function to highlight:', func)
       this.highlightFunction(func)
       
-      // Scroll to function
-      const codeBlocks = this.findCodeBlocks()
-      for (const block of codeBlocks) {
-        const text = block.textContent || block.innerText || ''
-        if (text.includes(func.name)) {
-          block.scrollIntoView({ behavior: 'smooth', block: 'center' })
-          break
+      // Scroll to function - try multiple methods for different platforms
+      let scrolled = false
+      
+      // Method 1: GitHub - use line numbers in DOM
+      if (func.line && func.line > 0) {
+        // Try GitHub's line ID format: L{lineNumber}
+        const lineElement = document.getElementById(`L${func.line}`) || 
+                          document.getElementById(`LC${func.line}`) ||
+                          document.querySelector(`[data-line-number="${func.line}"]`)
+        
+        if (lineElement) {
+          console.log('CodeLens: Found line element, scrolling to line', func.line)
+          
+          // Store current horizontal scroll position
+          const currentScrollLeft = window.pageXOffset || document.documentElement.scrollLeft
+          
+          // Get element position relative to document
+          const elementRect = lineElement.getBoundingClientRect()
+          const absoluteElementTop = elementRect.top + (window.pageYOffset || document.documentElement.scrollTop)
+          const targetScrollTop = absoluteElementTop - (window.innerHeight / 2) + (elementRect.height / 2)
+          
+          // Scroll to position (vertical only, preserve horizontal)
+          window.scrollTo({
+            top: Math.max(0, targetScrollTop),
+            left: currentScrollLeft,
+            behavior: 'smooth'
+          })
+          
+          // Highlight the line temporarily
+          const lineRow = lineElement.closest('tr') || lineElement.closest('.blob-code') || lineElement.parentElement
+          if (lineRow) {
+            const originalBg = lineRow.style.backgroundColor || ''
+            const originalTransition = lineRow.style.transition || ''
+            lineRow.style.transition = 'background-color 0.3s ease'
+            lineRow.style.backgroundColor = 'rgba(59, 130, 246, 0.3)'
+            
+            setTimeout(() => {
+              lineRow.style.backgroundColor = originalBg
+              setTimeout(() => {
+                lineRow.style.transition = originalTransition
+              }, 300)
+            }, 2000)
+          }
+          scrolled = true
         }
+      }
+      
+      // Method 2: Search for function name in code blocks
+      if (!scrolled) {
+        const codeBlocks = this.findCodeBlocks()
+        for (const block of codeBlocks) {
+          const text = block.textContent || block.innerText || ''
+          if (this.findFunctionInText(text, func.name)) {
+            console.log('CodeLens: Found function in code block, scrolling')
+            
+            // Store current horizontal scroll position
+            const currentScrollLeft = window.pageXOffset || document.documentElement.scrollLeft
+            
+            // Get block position
+            const blockRect = block.getBoundingClientRect()
+            const absoluteBlockTop = blockRect.top + (window.pageYOffset || document.documentElement.scrollTop)
+            const targetScrollTop = absoluteBlockTop - (window.innerHeight / 2) + (blockRect.height / 2)
+            
+            // Scroll vertically only
+            window.scrollTo({
+              top: Math.max(0, targetScrollTop),
+              left: currentScrollLeft,
+              behavior: 'smooth'
+            })
+            
+            // Highlight the block temporarily
+            const originalBg = block.style.backgroundColor || ''
+            const originalTransition = block.style.transition || ''
+            block.style.transition = 'background-color 0.3s ease'
+            block.style.backgroundColor = 'rgba(59, 130, 246, 0.3)'
+            
+            setTimeout(() => {
+              block.style.backgroundColor = originalBg
+              setTimeout(() => {
+                block.style.transition = originalTransition
+              }, 300)
+            }, 2000)
+            scrolled = true
+            break
+          }
+        }
+      }
+      
+      // Method 3: Monaco/Ace editors - scroll to line
+      if (!scrolled && func.line > 0) {
+        // Try Monaco editor
+        const monacoEditor = document.querySelector('.monaco-editor')
+        if (monacoEditor) {
+          const lineElement = monacoEditor.querySelector(`[data-line-number="${func.line}"]`)
+          if (lineElement) {
+            const currentScrollLeft = window.pageXOffset || document.documentElement.scrollLeft
+            const elementRect = lineElement.getBoundingClientRect()
+            const absoluteElementTop = elementRect.top + (window.pageYOffset || document.documentElement.scrollTop)
+            const targetScrollTop = absoluteElementTop - (window.innerHeight / 2)
+            
+            window.scrollTo({
+              top: Math.max(0, targetScrollTop),
+              left: currentScrollLeft,
+              behavior: 'smooth'
+            })
+            scrolled = true
+          }
+        }
+        
+        // Try Ace editor
+        const aceEditor = document.querySelector('.ace_editor')
+        if (aceEditor && !scrolled) {
+          const aceLines = aceEditor.querySelectorAll('.ace_line')
+          if (aceLines[func.line - 1]) {
+            const currentScrollLeft = window.pageXOffset || document.documentElement.scrollLeft
+            const lineElement = aceLines[func.line - 1]
+            const elementRect = lineElement.getBoundingClientRect()
+            const absoluteElementTop = elementRect.top + (window.pageYOffset || document.documentElement.scrollTop)
+            const targetScrollTop = absoluteElementTop - (window.innerHeight / 2)
+            
+            window.scrollTo({
+              top: Math.max(0, targetScrollTop),
+              left: currentScrollLeft,
+              behavior: 'smooth'
+            })
+            scrolled = true
+          }
+        }
+      }
+      
+      if (!scrolled) {
+        console.warn('CodeLens: Could not scroll to function location')
+      } else {
+        console.log('CodeLens: Successfully scrolled to function')
       }
     } else {
       console.warn('CodeLens: Function not found for highlighting:', functionName, 'Available functions:', this.complexityData.functions.map(f => f.name))
