@@ -216,25 +216,22 @@ const ComplexityChart = ({ functions }) => {
     '36+': 'bg-gradient-to-r from-red-500 to-pink-500'
   }
 
-  // Bubble chart data
-  const bubbleData = functions.slice(0, 20).map((func, index) => {
-    let color = ''
-    if (func.complexity <= 10) {
-      color = 'bg-green-500' // Low - Green
-    } else if (func.complexity <= 20) {
-      color = 'bg-blue-500' // Medium - Blue
-    } else if (func.complexity <= 35) {
-      color = 'bg-orange-500' // High - Orange
-    } else {
-      color = 'bg-red-500' // Extreme - Red
-    }
-    
-    return {
-      ...func,
-      size: Math.max(20, Math.min(60, func.complexity * 3)),
-      color: color
-    }
-  })
+  // Get top complex functions for detailed view
+  const topComplexFunctions = [...functions]
+    .sort((a, b) => b.complexity - a.complexity)
+    .slice(0, 5)
+  
+  // Use average complexity as the main score (rounded)
+  const qualityScore = averageComplexity
+  
+  // Complexity health indicators
+  const healthMetrics = {
+    excellent: functions.filter(f => f.complexity <= 5).length,
+    good: functions.filter(f => f.complexity > 5 && f.complexity <= 10).length,
+    moderate: functions.filter(f => f.complexity > 10 && f.complexity <= 20).length,
+    concerning: functions.filter(f => f.complexity > 20 && f.complexity <= 35).length,
+    critical: functions.filter(f => f.complexity > 35).length
+  }
 
   return (
     <div className="space-y-3">
@@ -275,49 +272,99 @@ const ComplexityChart = ({ functions }) => {
         </div>
       </div>
 
-      {/* Bubble Chart */}
-      <div>
-        <h3 className="font-semibold text-slate-100 mb-2 text-sm">Individual Function Complexity (Top 20)</h3>
-        <p className="text-xs text-slate-300 mb-2">Each bubble represents a function's cyclomatic complexity score</p>
-        <div className="bg-slate-800/50 rounded-xl p-3 h-36 relative border border-slate-700/50 backdrop-blur-sm">
-          {bubbleData.map((func, index) => (
-            <div
-              key={index}
-              className={`absolute rounded-full flex items-center justify-center text-white text-xs font-semibold cursor-pointer transition-all duration-300 hover:scale-110 ${func.color} shadow-lg`}
-              style={{
-                width: `${func.size * 0.8}px`,
-                height: `${func.size * 0.8}px`,
-                left: `${15 + (index % 5) * 60}px`,
-                top: `${15 + Math.floor(index / 5) * 60}px`,
-                fontSize: `${Math.max(7, func.size / 7)}px`
-              }}
-              title={`${func.name || 'Anonymous'}: ${func.complexity} complexity`}
-            >
-              {func.complexity}
-            </div>
-          ))}
-          
-          {/* Legend */}
-          <div className="absolute bottom-1.5 left-1.5 flex space-x-1.5 text-xs">
-            <div className="flex items-center space-x-0.5">
-              <div className="w-2 h-2 bg-green-500 rounded-full shadow-sm"></div>
-              <span className="text-slate-300 text-xs">Low</span>
-            </div>
-            <div className="flex items-center space-x-0.5">
-              <div className="w-2 h-2 bg-blue-500 rounded-full shadow-sm"></div>
-              <span className="text-slate-300 text-xs">Med</span>
-            </div>
-            <div className="flex items-center space-x-0.5">
-              <div className="w-2 h-2 bg-orange-500 rounded-full shadow-sm"></div>
-              <span className="text-slate-300 text-xs">High</span>
-            </div>
-            <div className="flex items-center space-x-0.5">
-              <div className="w-2 h-2 bg-red-500 rounded-full shadow-sm"></div>
-              <span className="text-slate-300 text-xs">Ext</span>
-            </div>
+      {/* Code Quality Score */}
+      <div className="bg-gradient-to-br from-indigo-600/20 to-purple-600/20 border border-indigo-500/30 rounded-xl p-4 backdrop-blur-sm">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-semibold text-slate-100 text-sm">Average Complexity Score</h3>
+          <div className={`text-3xl font-bold ${qualityScore <= 10 ? 'text-green-400' : qualityScore <= 20 ? 'text-blue-400' : qualityScore <= 35 ? 'text-orange-400' : 'text-red-400'}`}>
+            {qualityScore.toFixed(1)}
+          </div>
+        </div>
+        <div className="w-full bg-slate-700/50 rounded-full h-2 overflow-hidden shadow-inner mb-2">
+          <div
+            className={`h-2 rounded-full transition-all duration-700 ${qualityScore <= 10 ? 'bg-gradient-to-r from-green-500 to-emerald-500' : qualityScore <= 20 ? 'bg-gradient-to-r from-blue-500 to-cyan-500' : qualityScore <= 35 ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 'bg-gradient-to-r from-red-500 to-pink-500'} shadow-lg`}
+            style={{ width: `${Math.min((qualityScore / 50) * 100, 100)}%` }}
+          />
+        </div>
+        <p className="text-xs text-slate-300">
+          {qualityScore <= 5 ? '🎉 Excellent! Your code is highly maintainable.' : 
+           qualityScore <= 10 ? '👍 Good! Code quality is solid.' :
+           qualityScore <= 20 ? '⚠️ Moderate. Some improvements recommended.' :
+           qualityScore <= 35 ? '⚠️ High complexity. Refactoring needed.' :
+           '🚨 Critical. Urgent refactoring required.'}
+        </p>
+      </div>
+
+      {/* Health Metrics */}
+      <div className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 border border-slate-600/30 rounded-xl p-4 backdrop-blur-sm">
+        <h3 className="font-semibold text-slate-100 mb-3 text-sm flex items-center">
+          <span className="mr-2">🏥</span>
+          Codebase Health Metrics
+        </h3>
+        <div className="grid grid-cols-5 gap-2">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-400">{healthMetrics.excellent}</div>
+            <div className="text-xs text-slate-400 mt-1">Excellent</div>
+            <div className="text-xs text-slate-500">≤5</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-400">{healthMetrics.good}</div>
+            <div className="text-xs text-slate-400 mt-1">Good</div>
+            <div className="text-xs text-slate-500">6-10</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-cyan-400">{healthMetrics.moderate}</div>
+            <div className="text-xs text-slate-400 mt-1">Moderate</div>
+            <div className="text-xs text-slate-500">11-20</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-orange-400">{healthMetrics.concerning}</div>
+            <div className="text-xs text-slate-400 mt-1">High</div>
+            <div className="text-xs text-slate-500">21-35</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-red-400">{healthMetrics.critical}</div>
+            <div className="text-xs text-slate-400 mt-1">Critical</div>
+            <div className="text-xs text-slate-500">36+</div>
           </div>
         </div>
       </div>
+
+      {/* Top Complex Functions */}
+      {topComplexFunctions.length > 0 && (
+        <div className="bg-gradient-to-br from-amber-600/20 to-orange-600/20 border border-amber-500/30 rounded-xl p-4 backdrop-blur-sm">
+          <h3 className="font-semibold text-amber-200 mb-3 text-sm flex items-center">
+            <span className="mr-2">🎯</span>
+            Top {topComplexFunctions.length} Most Complex Functions
+          </h3>
+          <div className="space-y-2">
+            {topComplexFunctions.map((func, index) => (
+              <div key={index} className="flex items-center justify-between p-2 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-medium text-slate-200 truncate">
+                    {func.name || `Anonymous Function ${index + 1}`}
+                  </div>
+                  {func.params && (
+                    <div className="text-xs text-slate-400">
+                      {func.params.length} parameter{func.params.length !== 1 ? 's' : ''}
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center space-x-2 ml-2">
+                  <div className="text-right">
+                    <div className={`text-lg font-bold ${func.complexity <= 10 ? 'text-green-400' : func.complexity <= 20 ? 'text-blue-400' : func.complexity <= 35 ? 'text-orange-400' : 'text-red-400'}`}>
+                      {func.complexity}
+                    </div>
+                  </div>
+                  <div className={`px-2 py-1 rounded-lg text-xs font-semibold ${func.complexity <= 10 ? 'bg-green-500/20 text-green-300' : func.complexity <= 20 ? 'bg-blue-500/20 text-blue-300' : func.complexity <= 35 ? 'bg-orange-500/20 text-orange-300' : 'bg-red-500/20 text-red-300'}`}>
+                    {func.complexity <= 10 ? 'Low' : func.complexity <= 20 ? 'Med' : func.complexity <= 35 ? 'High' : 'Extreme'}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Statistics */}
       <div className="grid grid-cols-2 gap-2">
