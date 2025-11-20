@@ -6,8 +6,7 @@ const ComplexityScore = ({ score, label, colorClass }) => {
   
   const getBarColor = (score) => {
     if (score <= 10) return 'bg-gradient-to-r from-green-500 to-emerald-500'
-    if (score <= 20) return 'bg-gradient-to-r from-blue-500 to-cyan-500'
-    if (score <= 35) return 'bg-gradient-to-r from-yellow-500 to-orange-500'
+    if (score <= 15) return 'bg-gradient-to-r from-yellow-500 to-orange-500'
     return 'bg-gradient-to-r from-red-500 to-pink-500'
   }
   
@@ -23,17 +22,19 @@ const ComplexityScore = ({ score, label, colorClass }) => {
         <div 
           className={`h-2 rounded-full transition-all duration-500 ${getBarColor(score)} shadow-lg`}
           style={{ 
-            width: `${Math.min((score / 40) * 100, 100)}%` 
+            width: `${Math.min((score / 20) * 100, 100)}%` 
           }}
         ></div>
       </div>
       
       {/* Complexity explanation */}
       <div className="text-xs text-slate-400">
-        {score <= 10 && "🎉 Low complexity - Excellent code quality!"}
-        {score > 10 && score <= 20 && "👍 Medium complexity - Good, maintainable code"}
-        {score > 20 && score <= 35 && "⚠️ High complexity - Consider refactoring"}
-        {score > 35 && "🚨 Extreme complexity - Urgent refactoring needed"}
+        {score <= 5 && "🎉 Excellent - Keep it up!"}
+        {score > 5 && score <= 10 && "👍 Good - Consider some improvements"}
+        {score > 10 && score <= 15 && "⚠️ Fair - Needs refactoring"}
+        {score > 15 && score <= 20 && "⚠️ Fair - Needs refactoring"}
+        {score > 20 && score <=35 && "⚠️ Fair - Needs refactoring"}
+        {score > 35 && "🚨 Poor - Major refactoring required"}
       </div>
     </div>
   )
