@@ -69,10 +69,11 @@
   font-size: 24px;
   user-select: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   z-index: 10;
-  opacity: 0;
-  visibility: hidden;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .codelens-widget:not(.codelens-collapsed) .codelens-icon-btn {

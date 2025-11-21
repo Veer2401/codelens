@@ -261,9 +261,6 @@ class CodeLensAnalyzer {
     iconBtn.className = 'codelens-icon-btn'
     iconBtn.innerHTML = '🔍'
     iconBtn.title = 'CodeLens - Click to expand'
-    iconBtn.style.display = 'flex'
-    iconBtn.style.alignItems = 'center'
-    iconBtn.style.justifyContent = 'center'
     widget.appendChild(iconBtn)
     
     // Add widget to body with collapsed state by default
@@ -276,8 +273,14 @@ class CodeLensAnalyzer {
     widget.style.bottom = '20px'
     widget.style.right = '30px'
     
-    // Toggle expand/collapse on icon click
+    // Toggle expand/collapse on icon click - use mousedown for immediate response
+    iconBtn.addEventListener('mousedown', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+    })
+    
     iconBtn.addEventListener('click', (e) => {
+      e.preventDefault()
       e.stopPropagation()
       widget.classList.toggle('codelens-collapsed')
     })
