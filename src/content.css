@@ -2,13 +2,15 @@
 
 /* Floating Widget */
 .codelens-widget {
-  position: fixed;
-  top: 20px;
-  right: 30px;
-  width: 260px;
-  height: 260px;
-  min-height: 220px;
-  max-height: 260px;
+  position: fixed !important;
+  top: 20px !important;
+  right: 30px !important;
+  bottom: auto !important;
+  left: auto !important;
+  width: 700px;
+  height: auto;
+  min-height: 280px;
+  max-height: none;
   background: #1f2937;
   border: 1px solid #374151;
   border-radius: 12px;
@@ -18,7 +20,7 @@
   color: #f9fafb;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
-  overflow: hidden;
+  overflow: visible;
   box-sizing: border-box;
   max-width: calc(100vw - 40px);
   transform: translateZ(0);
@@ -27,17 +29,18 @@
 
 /* Collapsed state - only show icon */
 .codelens-widget.codelens-collapsed {
-  width: 56px;
-  height: 56px;
-  min-height: 56px;
-  border-radius: 50%;
-  background: transparent;
-  border: none;
-  overflow: visible;
-  bottom: 20px;
-  right: 30px;
-  top: auto;
-  box-shadow: none;
+  width: 56px !important;
+  height: 56px !important;
+  min-height: 56px !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  border: none !important;
+  overflow: visible !important;
+  top: 20px !important;
+  right: 30px !important;
+  bottom: auto !important;
+  left: auto !important;
+  box-shadow: none !important;
 }
 
 .codelens-widget.codelens-collapsed .widget-header,
@@ -137,45 +140,63 @@
 }
 
 .widget-content {
-  padding: 18px 18px 12px 18px;
+  padding: 16px;
   background: #1f2937;
   border-radius: 0 0 12px 12px;
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 420px;
 }
 
-.widget-stats {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 12px;
+.widget-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
-.stat-item {
-  flex: 1;
-  text-align: center;
-  background: rgba(30, 41, 59, 0.5);
-  padding: 8px 4px;
-  border-radius: 8px;
+.stat-card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%);
+  padding: 10px 12px;
+  border-radius: 10px;
   border: 1px solid rgba(59, 130, 246, 0.2);
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%);
+  transform: translateY(-2px);
+}
+
+.stat-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .stat-label {
-  font-size: 10px;
+  font-size: 9px;
   color: #9ca3af;
   font-weight: 500;
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .stat-value {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #3b82f6;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.widget-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 .complexity-score,
@@ -213,21 +234,28 @@
 
 .analyze-btn,
 .pdf-btn {
-  width: 100%;
-  padding: 10px 18px;
+  flex: 1;
+  padding: 10px 12px;
   background: linear-gradient(to right, #2563eb, #3b82f6, #1e40af);
   color: #ffffff;
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   transition: all 0.2s ease;
-  margin-top: 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-icon {
+  font-size: 14px;
 }
 
 .pdf-btn {
@@ -237,12 +265,12 @@
 
 .analyze-btn:hover,
 .pdf-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
 }
 
 .pdf-btn:hover {
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.5);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
   background: linear-gradient(to right, #6d28d9, #7c3aed, #5b21b6);
 }
 

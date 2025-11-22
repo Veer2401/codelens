@@ -92,11 +92,11 @@ const ComplexityChart = ({ functions }) => {
         </div>
       </div>
 
-      {/* Complexity Treemap */}
+      {/* 3D Complexity Treemap */}
       <div>
         <div className="flex items-center justify-between mb-2">
           <div>
-            <h3 className="font-semibold text-slate-100 text-sm">Complexity Treemap</h3>
+            <h3 className="font-semibold text-slate-100 text-sm">3D Complexity Map</h3>
             {selectedFunction && (
               <p className="text-xs text-blue-300 mt-0.5">Click again to deselect</p>
             )}
@@ -113,49 +113,134 @@ const ComplexityChart = ({ functions }) => {
         
         {!selectedFunction ? (
           <>
-            <p className="text-xs text-slate-300 mb-2">Click on a box to view function details</p>
+            <p className="text-xs text-slate-300 mb-2">Click on any block to view details</p>
             <div className="bg-slate-800/50 rounded-xl border border-slate-700/50 backdrop-blur-sm overflow-hidden">
-              {/* Treemap Container - Scrollable */}
-              <div className="p-2 overflow-y-auto max-h-[280px]">
-                <div className="grid gap-1 grid-cols-6" style={{ 
-                  gridAutoRows: 'minmax(45px, auto)'
+              {/* 3D Treemap Container */}
+              <div className="p-2 overflow-y-auto max-h-[280px]" style={{
+                perspective: '1000px',
+                perspectiveOrigin: '50% 50%'
+              }}>
+                <div className="grid gap-1.5 grid-cols-6" style={{ 
+                  gridAutoRows: 'minmax(50px, auto)',
+                  transformStyle: 'preserve-3d'
                 }}>
                   {functions.map((func, index) => {
-                    let bgColor = ''
-                    let textColor = 'text-white'
-                    let hoverText = `${func.name || 'Anonymous'}: ${func.complexity}`
+                    let gradientFrom = ''
+                    let gradientTo = ''
+                    let shadowColor = ''
                     
                     // Determine color based on complexity
                     if (func.complexity <= 5) {
-                      bgColor = 'bg-gradient-to-br from-green-500 to-green-600 hover:from-green-400 hover:to-green-500'
+                      gradientFrom = '#10b981'
+                      gradientTo = '#059669'
+                      shadowColor = 'rgba(16, 185, 129, 0.5)'
                     } else if (func.complexity <= 10) {
-                      bgColor = 'bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500'
+                      gradientFrom = '#3b82f6'
+                      gradientTo = '#1d4ed8'
+                      shadowColor = 'rgba(59, 130, 246, 0.5)'
                     } else if (func.complexity <= 15) {
-                      bgColor = 'bg-gradient-to-br from-yellow-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500'
+                      gradientFrom = '#fbbf24'
+                      gradientTo = '#f59e0b'
+                      shadowColor = 'rgba(251, 191, 36, 0.5)'
                     } else if (func.complexity <= 20) {
-                      bgColor = 'bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500'
+                      gradientFrom = '#f97316'
+                      gradientTo = '#ea580c'
+                      shadowColor = 'rgba(249, 115, 22, 0.5)'
                     } else {
-                      bgColor = 'bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500'
+                      gradientFrom = '#ef4444'
+                      gradientTo = '#dc2626'
+                      shadowColor = 'rgba(239, 68, 68, 0.5)'
                     }
                     
-                    // Calculate size based on complexity (larger = more complex)
-                    const sizeRatio = Math.max(1, Math.min(3, Math.ceil(func.complexity / 7)))
+                    // Calculate size based on complexity ranges (larger = more complex)
+                    let sizeRatio = 1
+                    if (func.complexity <= 5) {
+                      sizeRatio = 1
+                    } else if (func.complexity <= 10) {
+                      sizeRatio = 2
+                    } else if (func.complexity <= 15) {
+                      sizeRatio = 2
+                    } else if (func.complexity <= 20) {
+                      sizeRatio = 3
+                    } else {
+                      sizeRatio = 3
+                    }
+                    const depth = Math.min(25, func.complexity * 1.5)
                     
                     return (
                       <div
                         key={index}
                         onClick={() => setSelectedFunction(func)}
-                        className={`${bgColor} rounded-lg transition-all duration-200 cursor-pointer shadow-md hover:shadow-lg hover:scale-105 flex flex-col items-center justify-center p-1 ${textColor} hover:ring-2 hover:ring-white/50`}
-                        title={hoverText}
+                        className="relative cursor-pointer group"
                         style={{
                           gridColumn: `span ${sizeRatio}`,
                           gridRow: `span ${sizeRatio}`,
-                          minHeight: '45px'
+                          minHeight: '50px',
+                          transformStyle: 'preserve-3d',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                         }}
                       >
-                        <div className="text-base font-bold">{func.complexity}</div>
-                        <div className="text-xs truncate w-full text-center px-1" style={{ fontSize: '0.55rem', lineHeight: '1' }}>
-                          {(func.name || 'Anon').substring(0, 12)}
+                        {/* 3D Block */}
+                        <div
+                          className="w-full h-full rounded-lg text-white font-bold flex flex-col items-center justify-center relative overflow-hidden"
+                          style={{
+                            background: `linear-gradient(145deg, ${gradientFrom} 0%, ${gradientTo} 100%)`,
+                            boxShadow: `
+                              0 ${depth/2}px ${depth}px ${shadowColor},
+                              0 4px 8px rgba(0, 0, 0, 0.3),
+                              inset 0 -2px 8px rgba(0, 0, 0, 0.3),
+                              inset 0 2px 8px rgba(255, 255, 255, 0.2)
+                            `,
+                            transform: 'translateZ(0px)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = `translateZ(${depth}px) rotateX(5deg) rotateY(5deg)`
+                            e.currentTarget.style.boxShadow = `
+                              0 ${depth}px ${depth * 2}px ${shadowColor},
+                              0 8px 16px rgba(0, 0, 0, 0.4),
+                              inset 0 -2px 8px rgba(0, 0, 0, 0.3),
+                              inset 0 2px 8px rgba(255, 255, 255, 0.3)
+                            `
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateZ(0px)'
+                            e.currentTarget.style.boxShadow = `
+                              0 ${depth/2}px ${depth}px ${shadowColor},
+                              0 4px 8px rgba(0, 0, 0, 0.3),
+                              inset 0 -2px 8px rgba(0, 0, 0, 0.3),
+                              inset 0 2px 8px rgba(255, 255, 255, 0.2)
+                            `
+                          }}
+                        >
+                          {/* Top highlight */}
+                          <div 
+                            className="absolute inset-0 opacity-30"
+                            style={{
+                              background: 'linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, transparent 50%)'
+                            }}
+                          />
+                          
+                          {/* Content */}
+                          <div className="relative z-10">
+                            <div className="text-lg font-bold drop-shadow-lg">{func.complexity}</div>
+                            <div className="text-xs truncate px-1 mt-0.5 opacity-90" style={{ 
+                              fontSize: '0.6rem', 
+                              lineHeight: '1',
+                              textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                              maxWidth: `${sizeRatio * 60}px`
+                            }}>
+                              {(func.name || 'Anon').substring(0, sizeRatio * 5)}
+                            </div>
+                          </div>
+
+                          {/* 3D Edge effect */}
+                          <div 
+                            className="absolute bottom-0 left-0 right-0 h-1 opacity-50"
+                            style={{
+                              background: `linear-gradient(to bottom, transparent, ${gradientTo})`
+                            }}
+                          />
                         </div>
                       </div>
                     )
@@ -163,27 +248,27 @@ const ComplexityChart = ({ functions }) => {
                 </div>
               </div>
               
-              {/* Legend - Fixed at bottom */}
+              {/* Legend */}
               <div className="px-2 py-2 border-t border-slate-700/50 bg-slate-800/80">
                 <div className="flex flex-wrap gap-2 text-xs justify-center">
                   <div className="flex items-center space-x-1">
-                    <div className="w-2.5 h-2.5 bg-green-500 rounded shadow-sm"></div>
+                    <div className="w-3 h-3 rounded shadow-sm" style={{ background: 'linear-gradient(145deg, #10b981, #059669)' }}></div>
                     <span className="text-slate-300">1-5</span>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <div className="w-2.5 h-2.5 bg-blue-500 rounded shadow-sm"></div>
+                    <div className="w-3 h-3 rounded shadow-sm" style={{ background: 'linear-gradient(145deg, #3b82f6, #1d4ed8)' }}></div>
                     <span className="text-slate-300">6-10</span>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <div className="w-2.5 h-2.5 bg-yellow-500 rounded shadow-sm"></div>
+                    <div className="w-3 h-3 rounded shadow-sm" style={{ background: 'linear-gradient(145deg, #fbbf24, #f59e0b)' }}></div>
                     <span className="text-slate-300">11-15</span>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <div className="w-2.5 h-2.5 bg-orange-500 rounded shadow-sm"></div>
+                    <div className="w-3 h-3 rounded shadow-sm" style={{ background: 'linear-gradient(145deg, #f97316, #ea580c)' }}></div>
                     <span className="text-slate-300">16-20</span>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <div className="w-2.5 h-2.5 bg-red-500 rounded shadow-sm"></div>
+                    <div className="w-3 h-3 rounded shadow-sm" style={{ background: 'linear-gradient(145deg, #ef4444, #dc2626)' }}></div>
                     <span className="text-slate-300">20+</span>
                   </div>
                 </div>
@@ -321,7 +406,7 @@ const ComplexityChart = ({ functions }) => {
                 onClick={() => setSelectedFunction(null)}
                 className="flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white text-sm font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
               >
-                ← Back to Treemap
+                ← Back to 3D Map
               </button>
             </div>
           </div>

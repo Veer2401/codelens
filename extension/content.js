@@ -237,22 +237,54 @@ class CodeLensAnalyzer {
         <button class="widget-close" id="codelens-close">×</button>
       </div>
       <div class="widget-content">
-        <div class="widget-stats">
-          <div class="stat-item">
-            <div class="stat-label">Functions</div>
-            <div class="stat-value" id="codelens-count">-</div>
+        <div class="widget-stats-grid">
+          <div class="stat-card">
+            <div class="stat-info">
+              <div class="stat-label">Functions</div>
+              <div class="stat-value" id="codelens-count">-</div>
+            </div>
           </div>
-          <div class="stat-item">
-            <div class="stat-label">Avg Complexity</div>
-            <div class="stat-value" id="codelens-complexity">-</div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <div class="stat-label">Total Lines</div>
+              <div class="stat-value" id="codelens-lines">-</div>
+            </div>
           </div>
-          <div class="stat-item">
-            <div class="stat-label">Health Score</div>
-            <div class="stat-value" id="codelens-health">-%</div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <div class="stat-label">Avg Complexity</div>
+              <div class="stat-value" id="codelens-complexity">-</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <div class="stat-label">Health Score</div>
+              <div class="stat-value" id="codelens-health">-%</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <div class="stat-label">High Risk</div>
+              <div class="stat-value" id="codelens-highrisk">-</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-info">
+              <div class="stat-label">Code Language</div>
+              <div class="stat-value" id="codelens-language">-</div>
+            </div>
           </div>
         </div>
-        <button class="analyze-btn" id="codelens-analyze">🔍 Analyze Code</button>
-        <button class="pdf-btn" id="codelens-pdf">📄 Generate PDF</button>
+        <div class="widget-actions">
+          <button class="analyze-btn" id="codelens-analyze">
+            <span class="btn-icon">🔍</span>
+            <span>Analyze</span>
+          </button>
+          <button class="pdf-btn" id="codelens-pdf">
+            <span class="btn-icon">📄</span>
+            <span>Generate PDF</span>
+          </button>
+        </div>
       </div>
     `
     
@@ -261,9 +293,6 @@ class CodeLensAnalyzer {
     iconBtn.className = 'codelens-icon-btn'
     iconBtn.innerHTML = '🔍'
     iconBtn.title = 'CodeLens - Click to expand'
-    iconBtn.style.display = 'flex'
-    iconBtn.style.alignItems = 'center'
-    iconBtn.style.justifyContent = 'center'
     widget.appendChild(iconBtn)
     
     // Add widget to body with collapsed state by default
@@ -271,16 +300,20 @@ class CodeLensAnalyzer {
     document.body.appendChild(widget)
     this.floatingWidget = widget
     
-    // Ensure widget stays in fixed position
-    widget.style.position = 'fixed'
-    widget.style.bottom = '20px'
-    widget.style.right = '30px'
+    // Force fixed position on top right
+    widget.style.setProperty('position', 'fixed', 'important')
+    widget.style.setProperty('top', '20px', 'important')
+    widget.style.setProperty('right', '30px', 'important')
+    widget.style.setProperty('bottom', 'auto', 'important')
+    widget.style.setProperty('left', 'auto', 'important')
     
-    // Toggle expand/collapse on icon click
+    // Toggle expand/collapse on icon click with capture
     iconBtn.addEventListener('click', (e) => {
+      e.preventDefault()
       e.stopPropagation()
+      console.log('CodeLens widget clicked, toggling state')
       widget.classList.toggle('codelens-collapsed')
-    })
+    }, { capture: true })
     
     // Add event listeners
     const analyzeBtn = widget.querySelector('#codelens-analyze')
@@ -413,6 +446,9 @@ class CodeLensAnalyzer {
     const countElement = this.floatingWidget.querySelector('#codelens-count')
     const complexityElement = this.floatingWidget.querySelector('#codelens-complexity')
     const healthElement = this.floatingWidget.querySelector('#codelens-health')
+    const linesElement = this.floatingWidget.querySelector('#codelens-lines')
+    const highRiskElement = this.floatingWidget.querySelector('#codelens-highrisk')
+    const timeElement = this.floatingWidget.querySelector('#codelens-time')
     
     if (countElement) {
       countElement.textContent = this.complexityData.totalFunctions
@@ -427,6 +463,97 @@ class CodeLensAnalyzer {
       const avgComplexity = this.complexityData.averageComplexity || 0
       const healthScore = this.complexityData.totalFunctions === 0 ? 0 : Math.round(Math.min(100, Math.max(0, 100 - (avgComplexity / 40 * 100))))
       healthElement.textContent = healthScore + '%'
+    }
+
+    // Calculate and display total lines of code
+    if (linesElement) {
+      const { code } = this.getPrimaryCodeText()
+      const totalLines = code ? code.split('\n').length : 0
+      linesElement.textContent = totalLines.toLocaleString()
+    }
+
+    // Calculate and display high-risk functions (complexity > 15)
+    if (highRiskElement) {
+      const highRiskCount = this.complexityData.functions ? 
+        this.complexityData.functions.filter(f => f.complexity > 15).length : 0
+      highRiskElement.textContent = highRiskCount
+    }
+
+    // Detect and display code language
+    const languageElement = this.floatingWidget.querySelector('#codelens-language');
+    if (languageElement) {
+      let detectedLang = 'Unknown';
+      // Try to detect from file extension if available
+      let ext = '';
+      if (window.location.pathname) {
+        const match = window.location.pathname.match(/\.([a-zA-Z0-9]+)$/);
+        if (match) {
+          ext = match[1].toLowerCase();
+        }
+      }
+      switch (ext) {
+        case 'js':
+        case 'jsx':
+          detectedLang = ext === 'jsx' ? 'JSX (React)' : 'JavaScript';
+          break;
+        case 'ts':
+        case 'tsx':
+          detectedLang = ext === 'tsx' ? 'TypeScript (React)' : 'TypeScript';
+          break;
+        case 'java':
+          detectedLang = 'Java';
+          break;
+        case 'cpp':
+        case 'cc':
+        case 'cxx':
+        case 'c':
+          detectedLang = ext === 'c' ? 'C' : 'C++';
+          break;
+        case 'html':
+          detectedLang = 'HTML';
+          break;
+        case 'css':
+          detectedLang = 'CSS';
+          break;
+        case 'py':
+          detectedLang = 'Python';
+          break;
+        case 'go':
+          detectedLang = 'Go';
+          break;
+        case 'rb':
+          detectedLang = 'Ruby';
+          break;
+        case 'php':
+          detectedLang = 'PHP';
+          break;
+        case 'rs':
+          detectedLang = 'Rust';
+          break;
+        default:
+          // Fallback: try to detect from code content
+          const { code } = this.getPrimaryCodeText();
+          if (/import\s+React|<\w+\s/.test(code)) {
+            detectedLang = 'JSX (React)';
+          } else if (/public\s+class\s+|System\.out\.println/.test(code)) {
+            detectedLang = 'Java';
+          } else if (/def\s+\w+\s*\(|print\s*\(/.test(code)) {
+            detectedLang = 'Python';
+          } else if (/function\s+\w+\s*\(|const\s+\w+\s*=\s*\(/.test(code)) {
+            detectedLang = 'JavaScript';
+          } else if (/#include\s+<|std::/.test(code)) {
+            detectedLang = 'C++';
+          } else if (/package\s+[a-zA-Z0-9_.]+;/.test(code)) {
+            detectedLang = 'Java';
+          } else if (/class\s+\w+\s*\{/.test(code)) {
+            detectedLang = 'Java/C++/C#';
+          } else if (/<!DOCTYPE\s+html>/.test(code)) {
+            detectedLang = 'HTML';
+          } else if (/body\s*\{/.test(code)) {
+            detectedLang = 'CSS';
+          }
+      }
+      languageElement.textContent = detectedLang;
     }
   }
 

@@ -181,15 +181,6 @@ const Popup = () => {
           <div className="flex items-center space-x-2">
             <h1 className="text-xl font-bold tracking-tight">CodeLens</h1>
           </div>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={handleRefresh}
-              className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-200 hover:scale-105"
-              title="Refresh"
-            >
-              <span className="text-sm">🔄</span>
-            </button>
-          </div>
         </div>
         <p className="text-blue-100 text-xs mt-1 font-light">
           Real-time complexity analysis
@@ -238,7 +229,7 @@ const Popup = () => {
         {[
           { id: 'overview', label: 'Overview', icon: '📊' },
           { id: 'functions', label: 'Functions', icon: '🔍' },
-          { id: 'charts', label: 'Charts', icon: '📈' }
+          { id: 'charts', label: 'Analysis', icon: '📈' }
         ].map((tab) => (
           <button
             key={tab.id}
