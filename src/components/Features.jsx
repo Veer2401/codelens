@@ -1,7 +1,10 @@
 import React from 'react'
 import { CardBody, CardContainer, CardItem } from './ui/3d-card'
 
+import { useState } from 'react'
+
 const Features = () => {
+  const [expandedCard, setExpandedCard] = useState(null)
   const features = [
     {
       icon: (
@@ -10,7 +13,8 @@ const Features = () => {
         </svg>
       ),
       title: "Real-time Analysis",
-      description: "Get instant complexity insights as you code, with no need to refresh or rebuild."
+      description: "Get instant complexity insights as you code, with no need to refresh or rebuild.",
+      detailedDescription: "Our extension analyzes your code in real-time, providing immediate feedback on complexity. No need to wait or manually refresh—just code and see insights instantly."
     },
     {
       icon: (
@@ -19,7 +23,8 @@ const Features = () => {
         </svg>
       ),
       title: "Inline Highlights",
-      description: "Color-coded backgrounds show complexity levels directly in your code editor."
+      description: "Color-coded backgrounds show complexity levels directly in your code editor.",
+      detailedDescription: "Complexity levels are visually represented with color-coded highlights, making it easy to spot areas that need attention without leaving your editor."
     },
     {
       icon: (
@@ -28,7 +33,8 @@ const Features = () => {
         </svg>
       ),
       title: "Smart Detection",
-      description: "Automatically detects code blocks in GitHub, CodeSandbox, StackBlitz, and more."
+      description: "Automatically detects code blocks in GitHub, CodeSandbox, StackBlitz, and more.",
+      detailedDescription: "The extension intelligently finds code blocks across popular platforms, so you get complexity analysis wherever you work—no manual selection required."
     },
     {
       icon: (
@@ -37,7 +43,8 @@ const Features = () => {
         </svg>
       ),
       title: "Interactive Charts",
-      description: " Bubble charts and graphs show complexity distribution and trends."
+      description: "Bubble charts and graphs show complexity distribution and trends.",
+      detailedDescription: "Visualize your code’s complexity with interactive charts and graphs. Track trends and distributions to better understand and improve your codebase."
     },
     {
       icon: (
@@ -46,7 +53,8 @@ const Features = () => {
         </svg>
       ),
       title: "Privacy First",
-      description: "All analysis happens locally in your browser. No code is ever sent to servers."
+      description: "All analysis happens locally in your browser. No code is ever sent to servers.",
+      detailedDescription: "Your code never leaves your machine. All analysis is performed locally, ensuring your privacy and security."
     },
     {
       icon: (
@@ -55,7 +63,8 @@ const Features = () => {
         </svg>
       ),
       title: "Open Source",
-      description: "Built with transparency and community in mind. Contribute and improve together."
+      description: "Built with transparency and community in mind. Contribute and improve together.",
+      detailedDescription: "Codelens is open source, so anyone can contribute, audit, and improve the extension. Join the community and help shape the future of code analysis."
     }
   ]
 
@@ -80,12 +89,16 @@ const Features = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => (
             <CardContainer key={index} className="inter-var">
-              <CardBody className="relative group/card w-full h-60 rounded-2xl p-6 border transition-all duration-300 hover:shadow-2xl" style={{
-                background: 'rgba(30, 41, 59, 0.4)',
-                backdropFilter: 'blur(20px)',
-                borderColor: 'rgba(255, 255, 255, 0.1)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
-              }}>
+              <CardBody
+                className="relative group/card w-full h-60 rounded-2xl p-6 border transition-all duration-300 hover:shadow-2xl cursor-pointer"
+                style={{
+                  background: 'rgba(30, 41, 59, 0.4)',
+                  backdropFilter: 'blur(20px)',
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+                }}
+                onClick={() => setExpandedCard(index)}
+              >
                 <CardItem translateZ="50" className="mb-4">
                   <div className="text-blue-400 group-hover/card:text-cyan-400 transition-colors">
                     {feature.icon}
@@ -101,6 +114,26 @@ const Features = () => {
             </CardContainer>
           ))}
         </div>
+
+        {/* Expanded Card Modal */}
+        {expandedCard !== null && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+            <div className="bg-slate-900 rounded-2xl p-8 max-w-md w-full shadow-2xl relative">
+              <button
+                className="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl"
+                onClick={() => setExpandedCard(null)}
+                aria-label="Close"
+              >
+                &times;
+              </button>
+              <div className="flex flex-col items-center">
+                <div className="mb-4">{features[expandedCard].icon}</div>
+                <h3 className="text-2xl font-bold text-white mb-2">{features[expandedCard].title}</h3>
+                <p className="text-slate-300 mb-4 text-center">{features[expandedCard].detailedDescription}</p>
+              </div>
+            </div>
+          </div>
+        )}
         
         <div className="text-center mt-16">
           <a 
