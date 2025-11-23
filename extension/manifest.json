@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CodeLens",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "See your code's complexity in real time",
   "icons": {
     "16": "icons/icon16.png",
