@@ -5,24 +5,28 @@ import Features from './components/Features.jsx'
 import HowItWorks from './components/HowItWorks.jsx'
 import Footer from './components/Footer.jsx'
 import PrivacyPolicy from './components/PrivacyPolicy.jsx'
+import CustomCursor from './components/CustomCursor.jsx'
 
 function App() {
   return (
     <Router>
+      <CustomCursor />
       <Routes>
-        <Route path="/" element={
-          <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 relative overflow-hidden">
-            {/* Ambient glow effects */}
-            <div className="absolute top-0 -left-40 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute bottom-0 -right-40 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}} />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
-            
-            <Hero />
-            <HowItWorks />
-            <Features />
-            <Footer />
-          </div>
-        } />
+        <Route
+          path="/"
+          element={
+            <div className="min-h-screen bg-[#fafaf9] text-slate-900 relative">
+              <div className="relative z-10 flex flex-col min-h-screen">
+                <main className="flex-grow">
+                  <Hero />
+                  <HowItWorks />
+                  <Features />
+                </main>
+                <Footer />
+              </div>
+            </div>
+          }
+        />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Routes>
     </Router>

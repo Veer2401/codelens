@@ -1,7 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 const HowItWorks = () => {
   const [expandedCard, setExpandedCard] = useState(null)
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setExpandedCard(null)
+      }
+    }
+    if (expandedCard !== null) {
+      document.body.style.overflow = 'hidden'
+      window.addEventListener('keydown', handleKeyDown)
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [expandedCard])
 
   const steps = [
     {
@@ -17,7 +35,7 @@ const HowItWorks = () => {
         "Works seamlessly across all your Chrome tabs"
       ],
       icon: (
-        <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
           <path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7 1.49 0 2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"/>
         </svg>
       )
@@ -35,7 +53,7 @@ const HowItWorks = () => {
         "Automatic platform detection - no manual configuration needed"
       ],
       icon: (
-        <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
           <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
         </svg>
       )
@@ -54,7 +72,7 @@ const HowItWorks = () => {
         "Support for JavaScript, TypeScript, Python, Java, and more"
       ],
       icon: (
-        <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
         </svg>
       )
@@ -73,7 +91,7 @@ const HowItWorks = () => {
         "Customizable complexity thresholds and alert levels"
       ],
       icon: (
-        <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
           <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
         </svg>
       )
@@ -81,63 +99,61 @@ const HowItWorks = () => {
   ]
 
   return (
-    <section className="relative py-20 px-4 overflow-hidden">
-      {/* Background blur elements */}
-      <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 right-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
-      
-      <div className="max-w-6xl mx-auto relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-white via-blue-50 to-blue-100 bg-clip-text text-transparent">
+    <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-12 border-t border-slate-200/80">
+      <div className="max-w-7xl mx-auto">
+        {/* Left-Aligned Wide Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 md:mb-16 gap-6">
+          <div className="max-w-2xl text-left">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4">
               How It Works
+            </h2>
+            <p className="text-lg text-slate-600 leading-relaxed">
+              Simple, intuitive workflow to get you analyzing code complexity in minutes.
+            </p>
+          </div>
+          <div className="text-left md:text-right flex-shrink-0">
+            <span className="text-xs font-mono font-semibold uppercase tracking-widest text-slate-400">
+              4-Step Workflow
             </span>
-          </h2>
+          </div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+        {/* Expansive Steps Grid across the page */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {steps.map((step, index) => (
-            <div key={index} className="group h-full">
-              <div 
-                className="h-full flex flex-col items-center text-center p-6 rounded-3xl transition-all duration-500 group-hover:scale-105 group-hover:shadow-2xl cursor-pointer" 
-                style={{
-                  background: 'rgba(15, 23, 42, 0.3)',
-                  backdropFilter: 'blur(24px) saturate(180%)',
-                  border: '1px solid rgba(255, 255, 255, 0.125)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                  minHeight: '360px'
-                }} 
-                onClick={() => setExpandedCard(index)}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(30, 41, 59, 0.4)';
-                  e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-                }} 
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(15, 23, 42, 0.3)';
-                  e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.125)';
-                }}
-              >
-                <div className="mb-6 mt-2">
-                  <div className="w-20 h-20 mx-auto rounded-full shadow-lg flex items-center justify-center text-blue-400 transition-all duration-500 group-hover:text-cyan-400" style={{
-                    background: 'rgba(59, 130, 246, 0.1)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(59, 130, 246, 0.3)',
-                    boxShadow: '0 4px 24px rgba(59, 130, 246, 0.2)'
-                  }}>
-                    <div className="scale-75">
-                      {step.icon}
-                    </div>
+            <div
+              key={index}
+              className="group relative flex flex-col justify-between bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-7 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200 cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-slate-900"
+              onClick={() => setExpandedCard(index)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  setExpandedCard(index)
+                }
+              }}
+            >
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-xs font-mono font-bold tracking-wider text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
+                    {step.number}
+                  </span>
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-700 group-hover:text-slate-900 group-hover:bg-slate-100 transition-colors">
+                    {step.icon}
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-4 px-2">
+                <h3 className="text-lg font-bold text-slate-900 mb-2.5">
                   {step.title}
                 </h3>
-                <p className="text-slate-300 leading-relaxed text-sm flex-grow px-2">
+                <p className="text-sm text-slate-600 leading-relaxed">
                   {step.description}
                 </p>
-                <div className="mt-4 text-blue-400 text-sm font-medium">
-                  Click to learn more →
-                </div>
+              </div>
+
+              <div className="mt-8 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-500 group-hover:text-slate-900 transition-colors">
+                <span>Click to learn more</span>
+                <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
               </div>
             </div>
           ))}
@@ -147,96 +163,54 @@ const HowItWorks = () => {
       {/* Expanded Card Modal */}
       {expandedCard !== null && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn"
-          style={{
-            background: 'rgba(0, 0, 0, 0.8)',
-            backdropFilter: 'blur(10px)',
-            animation: 'fadeIn 0.3s ease-out'
-          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/50 backdrop-blur-sm"
           onClick={() => setExpandedCard(null)}
+          role="dialog"
+          aria-modal="true"
         >
           <div 
-            className="relative max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-3xl animate-scaleIn"
-            style={{
-              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)',
-              backdropFilter: 'blur(24px) saturate(180%)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-              animation: 'scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
-            }}
+            className="relative max-w-2xl w-full max-h-[88vh] overflow-y-auto rounded-2xl bg-white shadow-2xl border border-slate-200 p-6 sm:p-8 md:p-10"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button
               onClick={() => setExpandedCard(null)}
-              className="absolute top-6 right-6 w-10 h-10 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-all duration-300 z-10"
-              style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)'
-              }}
+              className="absolute top-5 right-5 w-9 h-9 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400"
+              aria-label="Close modal"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            <div className="p-8 md:p-12">
-              {/* Header Section */}
-              <div className="flex items-start gap-6 mb-8">
-                <div className="flex-shrink-0">
-                  <div 
-                    className="w-24 h-24 rounded-2xl shadow-2xl flex items-center justify-center text-blue-400"
-                    style={{
-                      background: 'rgba(59, 130, 246, 0.15)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(59, 130, 246, 0.4)',
-                      boxShadow: '0 8px 32px rgba(59, 130, 246, 0.3)'
-                    }}
-                  >
-                    {steps[expandedCard].icon}
-                  </div>
+            {/* Modal Content */}
+            <div className="text-left">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-800">
+                  {steps[expandedCard].icon}
                 </div>
-                <div className="flex-1">
-                  <div className="text-sm font-semibold text-blue-400 mb-2">
-                    STEP {steps[expandedCard].number}
-                  </div>
-                  <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                    {steps[expandedCard].title}
-                  </h3>
-                  <p className="text-slate-300 text-lg leading-relaxed">
-                    {steps[expandedCard].detailedDescription}
-                  </p>
-                </div>
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
+                  Step {steps[expandedCard].number}
+                </span>
               </div>
 
-              {/* Features List */}
-              <div 
-                className="rounded-2xl p-6 md:p-8"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)'
-                }}
-              >
-                <h4 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-                  <svg className="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  Key Features
+              <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">
+                {steps[expandedCard].title}
+              </h3>
+              
+              <p className="text-slate-600 text-base leading-relaxed mb-6">
+                {steps[expandedCard].detailedDescription}
+              </p>
+
+              <div className="border-t border-slate-100 pt-6">
+                <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-900 mb-4">
+                  Key Points:
                 </h4>
-                <ul className="space-y-4">
+                <ul className="space-y-2.5">
                   {steps[expandedCard].features.map((feature, idx) => (
-                    <li 
-                      key={idx} 
-                      className="flex items-start gap-3 text-slate-300 animate-slideIn"
-                      style={{
-                        animationDelay: `${idx * 0.1}s`,
-                        animationFillMode: 'both'
-                      }}
-                    >
-                      <svg className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="leading-relaxed">{feature}</span>
+                    <li key={idx} className="flex items-start gap-3 text-sm text-slate-700 bg-slate-50/70 border border-slate-100 rounded-xl p-3">
+                      <span className="text-emerald-600 font-bold mt-0.5">✓</span>
+                      <span className="leading-snug">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -245,51 +219,6 @@ const HowItWorks = () => {
           </div>
         </div>
       )}
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
-        @keyframes scaleIn {
-          from {
-            opacity: 0;
-            transform: scale(0.9) translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-          }
-        }
-
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateX(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-
-        .animate-scaleIn {
-          animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .animate-slideIn {
-          animation: slideIn 0.5s ease-out;
-        }
-      `}</style>
     </section>
   )
 }

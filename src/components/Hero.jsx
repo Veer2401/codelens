@@ -1,77 +1,107 @@
 import React from 'react'
-import Spotlight from './ui/spotlight'
+import HeroLensScan from './HeroLensScan.jsx'
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center py-20 px-4 overflow-hidden">
-      {/* Spotlight Effect - Behind content but visible */}
-      <Spotlight className="-top-40 left-1/4 md:-top-20 md:left-1/3 z-10" fill="rgba(147, 197, 253, 0.5)" />
-      
-      {/* Grid Background with glassmorphism */}
-      <div className="absolute inset-0 pointer-events-none select-none opacity-10 z-20"
-           style={{
-             backgroundSize: '60px 60px',
-             backgroundImage: 'linear-gradient(to right, rgba(147, 197, 253, 0.3) 1px, transparent 1px), linear-gradient(to bottom, rgba(147, 197, 253, 0.3) 1px, transparent 1px)'
-           }} />
-      
-      <div className="relative z-30 max-w-6xl mx-auto text-center">
-        <div className="mb-12">
-          <div className="mx-auto mb-8 flex items-center justify-center">
-            <div className="relative flex items-center justify-center w-40 h-40">
-              {/* Animated glow rings */}
-              <span className="absolute w-44 h-44 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 opacity-40 animate-fadePulse blur-xl"></span>
-              <span className="absolute w-48 h-48 rounded-full bg-gradient-to-r from-cyan-400 to-blue-400 opacity-30 animate-fadePulse blur-2xl" style={{animationDelay: '0.5s'}}></span>
-              
-              {/* Glass container */}
-              <div className="relative z-10 rounded-full w-40 h-40 flex items-center justify-center" style={{
-                background: 'rgba(30, 41, 59, 0.4)',
-                backdropFilter: 'blur(20px)',
-                border: '2px solid rgba(255, 255, 255, 0.2)',
-                boxShadow: '0 8px 32px rgba(59, 130, 246, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.2)'
-              }}>
-                <img
-                  src="code.jpg"
-                  alt="CodeLens Logo"
-                  className="w-36 h-36 object-cover rounded-full"
-                />
-              </div>
-            </div>
-          </div>
-          
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight">
-            <span className="bg-gradient-to-b from-white via-blue-50 to-blue-100 bg-clip-text text-transparent drop-shadow-2xl">
-              Code
-            </span>
-            <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+    <section className="relative pt-16 pb-20 md:pt-24 md:pb-28 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto overflow-hidden">
+      {/* One-time initial lens scanning animation across the hero section */}
+      <HeroLensScan />
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative z-10">
+        {/* Left Content Column */}
+        <div className="lg:col-span-7 text-left">
+          {/* Main Title with Flip Animation on Lens */}
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.08]">
+            Code{' '}
+            <span className="animate-flip-lens inline-block text-slate-500 font-normal underline decoration-slate-300 decoration-wavy decoration-1 underline-offset-8">
               Lens
             </span>
           </h1>
-          
-          <p className="text-xl md:text-2xl lg:text-3xl font-light max-w-4xl mx-auto leading-relaxed mb-8" style={{
-            background: 'linear-gradient(to right, rgba(203, 213, 225, 0.9), rgba(148, 163, 184, 0.9))',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
-          }}>
+
+          {/* Subtitle */}
+          <p className="text-xl sm:text-2xl md:text-3xl text-slate-600 font-normal leading-relaxed max-w-2xl mb-10">
             Your Code Quality, Visualized.
           </p>
+
+          {/* CTA Button */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <a
+              href="https://chromewebstore.google.com/detail/codelens/ohkmocfpalkecaihkoljlkbglldpbadf?hl=en-GB&authuser=0"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 rounded-xl bg-slate-900 px-8 py-4 text-base sm:text-lg font-medium text-white shadow-sm transition-all duration-200 hover:bg-slate-800 hover:shadow active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
+            >
+              <span>Add to Chrome</span>
+              <svg
+                className="w-5 h-5 text-slate-300 transition-transform duration-200 group-hover:translate-x-0.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+          </div>
         </div>
-        
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-          <a
-            href="https://chromewebstore.google.com/detail/codelens/ohkmocfpalkecaihkoljlkbglldpbadf?hl=en-GB&authuser=0"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary text-xl md:text-2xl px-12 py-5 inline-flex items-center gap-3 group"
-          >
-            Add to Chrome
-            <svg className="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </a>
+
+        {/* Right Visual / Product Preview Column */}
+        <div className="lg:col-span-5 flex justify-center lg:justify-end">
+          <div className="w-full max-w-md bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm transition-all hover:shadow-md">
+            {/* Top Bar with Logo & Product Indicator */}
+            <div className="flex items-center justify-between pb-6 border-b border-slate-100 mb-6">
+              <div className="flex items-center gap-3.5">
+                <div className="w-14 h-14 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm flex items-center justify-center flex-shrink-0">
+                  <img
+                    src="code.jpg"
+                    alt="CodeLens Logo"
+                    className="w-full h-full object-cover rounded-xl"
+                  />
+                </div>
+                <div>
+                  <div className="text-base font-bold text-slate-900">CodeLens</div>
+                  <div className="text-xs text-slate-500 font-mono">Chrome Extension</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200/60 rounded-full">
+                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider">Active</span>
+              </div>
+            </div>
+
+            {/* Live Visual Indicators Mock representing the visualizer */}
+            <div className="space-y-3">
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-mono font-medium text-slate-700">calculateComplexity()</div>
+                  <div className="text-[11px] text-slate-400">Cyclomatic: Score 3</div>
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  Low Risk
+                </span>
+              </div>
+
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-mono font-medium text-slate-700">parseAstTree()</div>
+                  <div className="text-[11px] text-slate-400">Cyclomatic: Score 8</div>
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-xs font-mono font-semibold bg-blue-100 text-blue-800 border border-blue-200">
+                  Medium Risk
+                </span>
+              </div>
+
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-mono font-medium text-slate-700">renderOverlayNode()</div>
+                  <div className="text-[11px] text-slate-400">Cyclomatic: Score 14</div>
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-xs font-mono font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                  Needs Refactor
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
-        
-        
       </div>
     </section>
   )

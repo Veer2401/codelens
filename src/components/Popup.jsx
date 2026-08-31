@@ -170,39 +170,37 @@ const Popup = () => {
     checkCurrentTab()
   }
 
-
-  
-
   return (
-    <div className="w-96 h-[600px] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+    <div className="w-96 h-[600px] bg-slate-900 text-slate-100 flex flex-col font-sans select-none">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-800 text-white p-4 shadow-lg flex-shrink-0">
+      <div className="bg-slate-950 px-4 py-3 border-b border-slate-800 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <h1 className="text-xl font-bold tracking-tight">CodeLens</h1>
+            <h1 className="text-base font-bold tracking-tight text-white">CodeLens</h1>
           </div>
+          <span className="text-[11px] font-mono text-slate-400">v1.1.0</span>
         </div>
-        <p className="text-blue-100 text-xs mt-1 font-light">
+        <p className="text-slate-400 text-xs mt-0.5">
           Real-time complexity analysis
         </p>
       </div>
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 p-2 mx-3 mt-2 rounded-xl backdrop-blur-sm">
-          <div className="text-red-200 text-xs mb-1">
-            <strong>Error:</strong> {error}
+        <div className="bg-rose-500/10 border border-rose-500/30 p-2.5 mx-3 mt-2.5 rounded-xl">
+          <div className="text-rose-200 text-xs mb-1.5 leading-snug">
+            <strong className="font-semibold">Error:</strong> {error}
           </div>
           <div className="flex space-x-2">
             <button 
               onClick={handleRefresh}
-              className="px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs rounded-full transition-all duration-200"
+              className="px-2.5 py-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 text-xs rounded-lg transition-colors"
             >
               Refresh
             </button>
             <button 
               onClick={getComplexityData}
-              className="px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs rounded-full transition-all duration-200"
+              className="px-2.5 py-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 text-xs rounded-lg transition-colors"
             >
               Try again
             </button>
@@ -212,20 +210,27 @@ const Popup = () => {
 
       {/* Platform Info */}
       {currentUrl && (
-        <div className="px-4 py-2 bg-slate-800/50 text-xs text-slate-300 border-b border-slate-700/50">
+        <div className="px-4 py-2 bg-slate-950/60 text-xs text-slate-400 border-b border-slate-800">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <span className="font-medium text-slate-400">Platform:</span>
-              <span className="text-slate-200">{new URL(currentUrl).hostname}</span>
-              {isSupportedPlatform && <span className="px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full text-xs">✓ Supported</span>}
-              {!isSupportedPlatform && <span className="px-2 py-0.5 bg-red-500/20 text-red-300 rounded-full text-xs">✗ Not supported</span>}
+            <div className="flex items-center space-x-2 truncate">
+              <span className="text-slate-500">Platform:</span>
+              <span className="text-slate-200 font-mono truncate">{new URL(currentUrl).hostname}</span>
             </div>
+            {isSupportedPlatform ? (
+              <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full text-[11px] font-medium flex-shrink-0">
+                ✓ Supported
+              </span>
+            ) : (
+              <span className="px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-full text-[11px] font-medium flex-shrink-0">
+                ✗ Not supported
+              </span>
+            )}
           </div>
         </div>
       )}
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-slate-700/50 bg-slate-800/30 px-2 pt-1 flex-shrink-0">
+      <div className="flex border-b border-slate-800 bg-slate-950/40 px-2 pt-1.5 flex-shrink-0">
         {[
           { id: 'overview', label: 'Overview', icon: '📊' },
           { id: 'functions', label: 'Functions', icon: '🔍' },
@@ -234,20 +239,20 @@ const Popup = () => {
           <button
             key={tab.id}
             onClick={() => setCurrentTab(tab.id)}
-            className={`flex-1 py-2 px-3 text-sm font-medium transition-all duration-200 rounded-t-xl ${
+            className={`flex-1 py-2 px-3 text-xs font-medium transition-all rounded-t-lg ${
               currentTab === tab.id
-                ? 'bg-gradient-to-b from-blue-600 to-blue-700 text-white shadow-lg'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/30'
+                ? 'bg-slate-800 text-white border-t border-x border-slate-700 font-semibold'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
             }`}
           >
-            <span className="mr-1 text-xs">{tab.icon}</span>
-            <span className="text-xs">{tab.label}</span>
+            <span className="mr-1.5">{tab.icon}</span>
+            <span>{tab.label}</span>
           </button>
         ))}
       </div>
 
       {/* Content */}
-      <div className="p-3 flex-1 overflow-y-auto">
+      <div className="p-3 flex-1 overflow-y-auto space-y-3">
         {currentTab === 'overview' && (
           <div className="space-y-3">
             <ComplexityScore
@@ -257,100 +262,100 @@ const Popup = () => {
             />
             
             {/* Code Health Score */}
-            <div className="bg-gradient-to-br from-purple-600/20 to-purple-700/20 border border-purple-500/30 rounded-xl p-3 backdrop-blur-sm">
+            <div className="bg-slate-800/80 border border-slate-700/60 rounded-xl p-3">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-purple-200 text-sm">
+                <h3 className="font-semibold text-slate-200 text-xs uppercase tracking-wider">
                   Code Health Score
                 </h3>
-                <div className="text-2xl font-bold text-purple-300">
+                <div className="text-xl font-bold font-mono text-slate-100">
                   {complexityData.totalFunctions === 0 ? 0 : Math.round(Math.min(100, Math.max(0, 100 - (getAverageComplexity() / 40 * 100))))}%
                 </div>
               </div>
-              <div className="w-full bg-slate-700/50 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-slate-700/60 rounded-full h-2 overflow-hidden">
                 <div 
-                  className="h-2 rounded-full transition-all duration-500 bg-gradient-to-r from-purple-500 to-purple-400"
+                  className="h-2 rounded-full transition-all duration-300 bg-blue-500"
                   style={{ width: `${complexityData.totalFunctions === 0 ? 0 : Math.round(Math.min(100, Math.max(0, 100 - (getAverageComplexity() / 40 * 100))))}%` }}
                 />
               </div>
-              <p className="text-xs text-purple-200 mt-1">
+              <p className="text-xs text-slate-400 mt-1.5">
                 {getAverageComplexity() <= 5 ? 'Excellent maintainability' : getAverageComplexity() <= 10 ? 'Good code structure' : getAverageComplexity() <= 15 ? 'Needs improvement' : 'Requires refactoring'}
               </p>
             </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-2">
-              <div className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-xl p-3 text-center border border-slate-600/30 shadow-lg">
-                <div className="text-2xl font-bold text-white truncate" title={complexityData.totalFunctions}>
+              <div className="bg-slate-800/80 rounded-xl p-3 text-center border border-slate-700/60">
+                <div className="text-xl font-bold font-mono text-white truncate" title={complexityData.totalFunctions}>
                   {complexityData.totalFunctions}
                 </div>
-                <div className="text-xs text-slate-300 mt-1">Total Functions</div>
+                <div className="text-xs text-slate-400 mt-0.5">Total Functions</div>
               </div>
-              <div className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm rounded-xl p-3 text-center border border-slate-600/30 shadow-lg">
-                <div className="text-2xl font-bold text-white truncate" title={getAverageComplexity().toFixed(2)}>
+              <div className="bg-slate-800/80 rounded-xl p-3 text-center border border-slate-700/60">
+                <div className="text-xl font-bold font-mono text-white truncate" title={getAverageComplexity().toFixed(2)}>
                   {getAverageComplexity().toFixed(2)}
                 </div>
-                <div className="text-xs text-slate-300 mt-1">Avg Complexity</div>
+                <div className="text-xs text-slate-400 mt-0.5">Avg Complexity</div>
               </div>
-              <div className="bg-gradient-to-br from-green-700/30 to-green-800/30 backdrop-blur-sm rounded-xl p-3 text-center border border-green-600/30 shadow-lg">
-                <div className="text-2xl font-bold text-green-300 truncate">
+              <div className="bg-slate-800/80 rounded-xl p-3 text-center border border-slate-700/60">
+                <div className="text-xl font-bold font-mono text-emerald-400 truncate">
                   {complexityData.functions.filter(f => f.complexity <= 10).length}
                 </div>
-                <div className="text-xs text-green-200 mt-1">Low Risk</div>
+                <div className="text-xs text-slate-400 mt-0.5">Low Risk</div>
               </div>
-              <div className="bg-gradient-to-br from-red-700/30 to-red-800/30 backdrop-blur-sm rounded-xl p-3 text-center border border-red-600/30 shadow-lg">
-                <div className="text-2xl font-bold text-red-300 truncate">
+              <div className="bg-slate-800/80 rounded-xl p-3 text-center border border-slate-700/60">
+                <div className="text-xl font-bold font-mono text-rose-400 truncate">
                   {complexityData.functions.filter(f => f.complexity > 15).length}
                 </div>
-                <div className="text-xs text-red-200 mt-1">High Risk</div>
+                <div className="text-xs text-slate-400 mt-0.5">High Risk</div>
               </div>
             </div>
 
             {/* Complexity Breakdown */}
-            <div className="bg-gradient-to-br from-slate-700/30 to-slate-800/30 border border-slate-600/30 rounded-xl p-3 backdrop-blur-sm">
-              <h3 className="font-semibold text-slate-100 mb-2 flex items-center text-sm">
+            <div className="bg-slate-800/80 border border-slate-700/60 rounded-xl p-3">
+              <h3 className="font-semibold text-slate-200 mb-2 flex items-center text-xs uppercase tracking-wider">
                 <span className="mr-1.5">📊</span>
                 Complexity Breakdown
               </h3>
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
+              <div className="space-y-1.5 text-xs font-mono">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
                     <span className="text-slate-300">Low (1-10)</span>
                   </div>
-                  <span className="font-semibold text-green-300">{complexityData.functions.filter(f => f.complexity <= 10).length}</span>
+                  <span className="font-semibold text-emerald-400">{complexityData.functions.filter(f => f.complexity <= 10).length}</span>
                 </div>
-                <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
+                    <div className="w-2 h-2 bg-amber-500 rounded-full mr-2"></div>
                     <span className="text-slate-300">Medium (11-15)</span>
                   </div>
-                  <span className="font-semibold text-yellow-300">{complexityData.functions.filter(f => f.complexity > 10 && f.complexity <= 15).length}</span>
+                  <span className="font-semibold text-amber-400">{complexityData.functions.filter(f => f.complexity > 10 && f.complexity <= 15).length}</span>
                 </div>
-                <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                    <div className="w-2 h-2 bg-rose-500 rounded-full mr-2"></div>
                     <span className="text-slate-300">High (16+)</span>
                   </div>
-                  <span className="font-semibold text-red-300">{complexityData.functions.filter(f => f.complexity > 15).length}</span>
+                  <span className="font-semibold text-rose-400">{complexityData.functions.filter(f => f.complexity > 15).length}</span>
                 </div>
               </div>
             </div>
 
             {/* Risk Assessment & Recommendations */}
-            <div className="bg-gradient-to-br from-blue-600/20 to-blue-700/20 border border-blue-500/30 rounded-xl p-3 backdrop-blur-sm">
-              <h3 className="font-semibold text-blue-200 mb-2 flex items-center text-sm">
+            <div className="bg-slate-800/80 border border-slate-700/60 rounded-xl p-3">
+              <h3 className="font-semibold text-slate-200 mb-2 flex items-center text-xs uppercase tracking-wider">
                 <span className="mr-1.5">🎯</span>
                 Recommendations
               </h3>
-              <ul className="text-xs text-blue-100 space-y-1.5">
+              <ul className="text-xs text-slate-300 space-y-1.5">
                 {getAverageComplexity() <= 5 && (
                   <>
                     <li className="flex items-start">
-                      <span className="mr-1.5">✅</span>
+                      <span className="mr-1.5 text-emerald-400">✅</span>
                       <span>Excellent! Your code has low complexity</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="mr-1.5">•</span>
+                      <span className="mr-1.5 text-slate-500">•</span>
                       <span>Maintain this quality as you add features</span>
                     </li>
                   </>
@@ -358,11 +363,11 @@ const Popup = () => {
                 {getAverageComplexity() > 5 && getAverageComplexity() <= 10 && (
                   <>
                     <li className="flex items-start">
-                      <span className="mr-1.5">✓</span>
+                      <span className="mr-1.5 text-blue-400">✓</span>
                       <span>Good complexity level overall</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="mr-1.5">•</span>
+                      <span className="mr-1.5 text-slate-500">•</span>
                       <span>Monitor high-complexity functions</span>
                     </li>
                   </>
@@ -370,22 +375,22 @@ const Popup = () => {
                 {getAverageComplexity() > 10 && (
                   <>
                     <li className="flex items-start">
-                      <span className="mr-1.5">⚠️</span>
+                      <span className="mr-1.5 text-amber-400">⚠️</span>
                       <span>High complexity detected</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="mr-1.5">•</span>
+                      <span className="mr-1.5 text-slate-500">•</span>
                       <span>Break down complex functions into smaller ones</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="mr-1.5">•</span>
+                      <span className="mr-1.5 text-slate-500">•</span>
                       <span>Use early returns to reduce nesting</span>
                     </li>
                   </>
                 )}
                 {complexityData.functions.filter(f => f.complexity > 15).length > 0 && (
                   <li className="flex items-start">
-                    <span className="mr-1.5">🔴</span>
+                    <span className="mr-1.5 text-rose-400">🔴</span>
                     <span>{complexityData.functions.filter(f => f.complexity > 15).length} function{complexityData.functions.filter(f => f.complexity > 15).length > 1 ? 's' : ''} need immediate attention</span>
                   </li>
                 )}
@@ -404,9 +409,9 @@ const Popup = () => {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-slate-700/50 p-2 bg-slate-800/30 backdrop-blur-sm flex-shrink-0">
-        <div className="flex items-center justify-center text-xs text-slate-400">
-          {/* Footer content */}
+      <div className="border-t border-slate-800 p-2 bg-slate-950/60 flex-shrink-0">
+        <div className="flex items-center justify-center text-[11px] text-slate-500">
+          CodeLens Real-Time Analysis
         </div>
       </div>
     </div>
